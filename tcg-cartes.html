@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Booster perso : tire tes cartes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@400;700&display=swap">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f1eee8;--panel:#fff;--ink:#1d2233;--mute:#6a7088;--line:#d9d5ca;--accent:#3b4cca;
+  --c-commune:#8a90a0;--c-rare:#2f7fe0;--c-epique:#9a45e0;--c-legendaire:#e0a21a;
+  --serif:"Cinzel",Georgia,serif;--sans:"Nunito",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1424;--panel:#171e35;--ink:#eceefa;--mute:#98a0c0;--line:#2a3354;--accent:#8c9bff;}}
+:root[data-theme="dark"]{--bg:#0f1424;--panel:#171e35;--ink:#eceefa;--mute:#98a0c0;--line:#2a3354;--accent:#8c9bff;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+h1{font-family:var(--serif);font-weight:800;font-size:1.7rem;margin:4px 0 14px;letter-spacing:.02em}
+nav{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:22px}
+nav button{background:none;border:0;color:var(--mute);font:700 1rem var(--sans);padding:10px 14px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+nav button[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 22px;font:700 1rem var(--sans);cursor:pointer}
+:root[data-theme="dark"] .btn{color:#0f1424}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0f1424}}
+.btn.ghost{background:none;color:var(--ink)!important;border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+section[hidden]{display:none}
+
+/* carte */
+.card{width:220px;aspect-ratio:5/7;border-radius:14px;padding:8px;color:#161a2a;position:relative;overflow:hidden;
+  background:linear-gradient(145deg,var(--rc),color-mix(in srgb,var(--rc) 55%,#fff));
+  box-shadow:0 6px 18px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:6px}
+.card[data-r="commune"]{--rc:var(--c-commune)}.card[data-r="rare"]{--rc:var(--c-rare)}
+.card[data-r="epique"]{--rc:var(--c-epique)}.card[data-r="legendaire"]{--rc:var(--c-legendaire)}
+.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:6px;background:#fffc;border-radius:8px;padding:4px 8px}
+.card .nom{font:800 .88rem var(--serif);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .art{flex:0 0 46%;border-radius:8px;background:#0003 center/cover no-repeat;display:grid;place-items:center;font-size:2.6rem;border:2px solid #fffa}
+.card .rar{font:700 .68rem var(--sans);text-align:center;background:#161a2a;color:#fff;border-radius:6px;padding:2px 0}
+.card .desc{flex:1;background:#fffd;border-radius:8px;padding:6px 8px;font-size:.78rem;line-height:1.35;overflow:auto}
+.card[data-r="legendaire"]::after,.card[data-r="epique"]::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,#fff7 50%,transparent 65%);background-size:250% 100%;animation:shine 3.2s linear infinite}
+@keyframes shine{from{background-position:150% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){.card::after{animation:none!important}.flip{transition:none!important}}
+
+/* tirage */
+.stage{display:flex;flex-direction:column;align-items:center;gap:18px;padding:10px 0}
+.flip{width:220px;aspect-ratio:5/7;perspective:900px}
+.flip>div{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s}
+.flip.open>div{transform:rotateY(180deg)}
+.flip .face{position:absolute;inset:0;backface-visibility:hidden}
+.flip .face.front{transform:rotateY(180deg)}
+.flip .face.front .card{width:100%}
+.dos{width:100%;height:100%;border-radius:14px;border:3px solid var(--line);display:grid;place-items:center;font-size:3.4rem;
+  background:repeating-linear-gradient(45deg,var(--panel) 0 10px,var(--bg) 10px 20px);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.hist{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:30px}
+.pill{font:700 .75rem var(--sans);padding:3px 10px;border-radius:99px;color:#fff;background:var(--rc)}
+.pill[data-r="commune"]{--rc:var(--c-commune)}.pill[data-r="rare"]{--rc:var(--c-rare)}
+.pill[data-r="epique"]{--rc:var(--c-epique)}.pill[data-r="legendaire"]{--rc:var(--c-legendaire)}
+.mute{color:var(--mute)}
+
+/* partage */
+.share{display:grid;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:22px}
+.share textarea{min-height:0;font:.75rem/1.3 ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
+.share .row2{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+/* booster */
+.pack{position:relative;width:200px;height:290px;border:0;cursor:pointer;border-radius:12px;color:#fff;font-family:var(--serif);
+  background:linear-gradient(160deg,#3b4cca,#9a45e0 55%,#e0a21a);box-shadow:0 10px 28px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;animation:float 3s ease-in-out infinite}
+.pack::before{content:"";position:absolute;inset:0;border-radius:12px;background:repeating-linear-gradient(100deg,#fff2 0 3px,transparent 3px 11px)}
+.pack span{position:relative}
+.pk-emoji{font-size:3.4rem}.pk-name{font-weight:800;font-size:1.5rem}.pk-sub{font:700 .9rem var(--sans)}
+.pack .flap{position:absolute;left:0;right:0;top:0;height:28px;border-radius:12px 12px 0 0;background:linear-gradient(160deg,#4a5ae0,#a55be8);
+  background-image:repeating-linear-gradient(90deg,#fff5 0 2px,transparent 2px 6px);transition:transform .6s,opacity .6s}
+.pack.opening{animation:none;transform:scale(1.15);filter:brightness(1.7);opacity:0;transition:transform .7s .2s,filter .7s .2s,opacity .6s .35s}
+.pack.opening .flap{transform:translateY(-100px) rotate(-25deg);opacity:0}
+.pack.shake{animation:shake .8s ease-in}
+@keyframes float{50%{transform:translateY(-8px)}}
+@keyframes shake{0%{transform:rotate(0)}15%{transform:rotate(-4deg)}30%{transform:rotate(4deg) scale(1.03)}45%{transform:rotate(-6deg)}60%{transform:rotate(6deg) scale(1.06)}75%{transform:rotate(-8deg)}100%{transform:rotate(0) scale(1.1);filter:brightness(1.4)}}
+.fan{position:relative;width:220px;aspect-ratio:5/7;margin:8px 12px;cursor:pointer;border-radius:14px}
+.fan .flip{position:absolute;inset:0;width:100%;height:100%;transform:var(--t);transition:transform .45s,opacity .45s;animation:deal .5s var(--d) backwards}
+.fan .flip.gone{transform:translateX(-120%) rotate(-14deg);opacity:0}
+@keyframes deal{from{opacity:0;transform:translateY(-90px) scale(.6) rotate(-10deg)}}
+.flip.fx-rare{--g:#2f7fe0}.flip.fx-epique{--g:#9a45e0}.flip.fx-legendaire{--g:#e0a21a;animation:bump .6s}
+.flip[class*="fx-"] .front .card{box-shadow:0 0 28px 6px var(--g);animation:glow 1.1s ease-out}
+@keyframes glow{0%{box-shadow:0 0 0 0 var(--g)}40%{box-shadow:0 0 60px 20px var(--g)}}
+@keyframes bump{40%{transform:var(--t) scale(1.12)}}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:0;animation:fl .9s ease-out}
+@keyframes fl{20%{opacity:var(--a)}}
+.spark{position:absolute;left:50%;top:50%;width:9px;height:9px;margin:-4px;border-radius:50%;pointer-events:none;z-index:5;animation:sp .9s ease-out forwards}
+@keyframes sp{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+body.quake main{animation:quake .5s}
+@keyframes quake{20%{transform:translate(-5px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(3px,3px)}}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.mini{width:154px;height:216px;animation:pop .4s backwards}
+.mini .card{transform:scale(.7);transform-origin:top left}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pack,.mini,.fan .flip,body.quake main{animation:none!important}.flash,.spark{display:none}}
+
+/* collection */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;justify-items:center}
+.item{display:flex;flex-direction:column;gap:8px;align-items:center}
+.item .btn{padding:6px 14px;font-size:.85rem}
+
+/* types, vues, recadrage */
+.card[data-t]{border:3px solid var(--tc);box-shadow:inset 0 0 0 2px #fff8,0 6px 18px rgba(0,0,0,.25)}
+.card[data-t] .art{border-color:var(--tc)}
+.card[data-t] .top{background:linear-gradient(90deg,#fffd,color-mix(in srgb,var(--tc) 35%,#fff))}
+.card .ty{font-size:.9rem}
+.card .cnt{position:absolute;right:14px;top:44px;background:#161a2a;color:#fff;font:800 .8rem var(--sans);padding:1px 8px;border-radius:99px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.seg button{background:none;border:0;padding:8px 18px;font:700 .95rem var(--sans);color:var(--mute);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tools input{flex:1 1 180px;width:auto}.tools select{width:auto}
+.share[hidden]{display:none}
+.item .btn{padding:6px 10px}
+#cropBox:not([hidden]){display:grid;gap:8px}
+#crop{width:100%;max-width:360px;aspect-ratio:3/2;border-radius:8px;border:1px solid var(--line);touch-action:none;cursor:grab;background:#0002}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+
+/* animations */
+body{overflow-x:hidden}
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;filter:blur(50px);
+  background:radial-gradient(circle at 18% 28%,color-mix(in srgb,var(--accent) 32%,transparent),transparent 42%),radial-gradient(circle at 82% 72%,#e0a21a2e,transparent 42%),radial-gradient(circle at 62% 18%,#9a45e02e,transparent 38%);
+  animation:aurora 20s ease-in-out infinite alternate}
+@keyframes aurora{to{transform:translate(4%,3%) rotate(8deg) scale(1.08)}}
+h1{background:linear-gradient(90deg,var(--ink) 0%,var(--accent) 25%,#e0a21a 50%,var(--accent) 75%,var(--ink) 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:titlegrad 10s linear infinite}
+@keyframes titlegrad{to{background-position:150% 0}}
+section:not([hidden]){animation:fadein .4s ease-out}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}}
+.btn{transition:transform .15s,box-shadow .2s,filter .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.25);filter:brightness(1.08)}
+.btn:active{transform:scale(.96)}
+.btn:disabled:hover{transform:none;box-shadow:none;filter:none}
+.grid.enter .item{animation:rise .5s cubic-bezier(.2,.8,.3,1) backwards;animation-delay:calc(var(--i,0)*45ms)}
+@keyframes rise{from{opacity:0;transform:translateY(26px) scale(.93)}}
+/* inclinaison 3D + reflet holographique */
+.card{transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .15s ease-out}
+.card::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s;z-index:3;
+  background:radial-gradient(circle at var(--mx,50%) var(--my,50%),#fffb,transparent 45%);mix-blend-mode:soft-light}
+.card:hover::before{opacity:1}
+.card[data-r="epique"]::before,.card[data-r="legendaire"]::before{background:radial-gradient(circle at var(--mx,50%) var(--my,50%),#fffc,transparent 38%),linear-gradient(115deg,#ff6ec7,#ffd86e,#6effc4,#6ec7ff,#c76eff);mix-blend-mode:overlay}
+.flip.fx-legendaire .front .card{animation:glow 1.1s ease-out,floaty 3.2s ease-in-out 1.1s infinite}
+#preview .card{animation:floaty 4s ease-in-out infinite}
+@keyframes floaty{50%{translate:0 -7px}}
+/* booster */
+#packZone{position:relative;isolation:isolate}
+#packZone:not([hidden])::before{content:"";position:absolute;inset:-34px;border-radius:50%;z-index:-1;filter:blur(38px);opacity:.5;
+  background:conic-gradient(#3b4cca,#9a45e0,#e0a21a,#2f7fe0,#3b4cca);animation:spin 9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pack{transition:scale .2s}.pack:hover{scale:1.05}
+.pack::after{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;
+  background:linear-gradient(115deg,transparent 30%,#fff8 50%,transparent 70%);background-size:250% 100%;animation:shine 2.8s linear infinite}
+@keyframes deal{0%{opacity:0;transform:translateY(-140px) scale(.45) rotate(-20deg)}65%{opacity:1;transform:var(--t) translateY(16px) scale(1.05)}}
+.fan .flip{transition:transform .45s cubic-bezier(.6,-.25,.7,1),opacity .45s}
+.fan .flip.gone{transform:translate(-130%,30px) rotate(-20deg) scale(.6);opacity:0}
+.flip[data-r="rare"]{--rg:#2f7fe0}.flip[data-r="epique"]{--rg:#9a45e0}.flip[data-r="legendaire"]{--rg:#e0a21a}
+.fan .flip.charge{animation:charge .2s linear infinite}
+.flip.charge .dos{animation:aura .45s ease-in-out infinite alternate}
+@keyframes charge{25%{transform:var(--t) translate(-3px,1px) rotate(-1.5deg)}75%{transform:var(--t) translate(3px,-1px) rotate(1.5deg)}}
+@keyframes aura{from{box-shadow:0 0 10px 2px var(--rg)}to{box-shadow:0 0 64px 20px var(--rg)}}
+.mini{animation:pop .55s cubic-bezier(.2,.8,.3,1.2) backwards}
+@keyframes pop{0%{transform:scale(.3) rotate(-14deg);opacity:0}70%{transform:scale(1.08) rotate(2deg)}}
+.ring{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:50%;border:4px solid var(--rc2,#fff);pointer-events:none;z-index:6;animation:ring .9s ease-out forwards}
+@keyframes ring{to{transform:scale(10);opacity:0;border-width:1px}}
+.rays{position:absolute;left:50%;top:50%;width:560px;height:560px;margin:-280px;border-radius:50%;pointer-events:none;z-index:-1;opacity:0;
+  background:repeating-conic-gradient(var(--rc2,#fff8) 0 7deg,transparent 7deg 20deg);
+  -webkit-mask:radial-gradient(circle,#000 8%,transparent 68%);mask:radial-gradient(circle,#000 8%,transparent 68%);
+  animation:rays var(--dur,1.1s) ease-out forwards}
+@keyframes rays{0%{opacity:0;transform:scale(.3) rotate(0)}25%{opacity:.9}100%{opacity:0;transform:scale(1.25) rotate(55deg)}}
+.drop{position:fixed;top:-20px;width:9px;height:14px;border-radius:2px;z-index:60;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(var(--r))}}
+/* vue agrandie */
+#lb{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden;
+  background:radial-gradient(circle at 50% 40%,#1c2448e6,#05070ff2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#lb[hidden]{display:none}
+#lb:not([hidden]){animation:lbin .3s ease-out}
+@keyframes lbin{from{opacity:0}}
+.lbw{position:relative;width:220px;height:308px;scale:var(--k,1);flex:none}
+.lbw .card{animation:floaty 4s ease-in-out infinite}
+.lb-halo{position:absolute;left:50%;top:50%;width:640px;height:640px;margin:-320px;border-radius:50%;pointer-events:none;z-index:-1;opacity:.55;
+  background:repeating-conic-gradient(var(--rc2) 0 6deg,transparent 6deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 6%,transparent 66%);mask:radial-gradient(circle,#000 6%,transparent 66%);animation:spin 16s linear infinite}
+#lbcap{margin:0;color:#fff;font:800 1.25rem var(--serif);text-align:center;padding:0 16px}
+#lbn{margin:0;color:#aab3d6;font-size:.85rem}
+.lbx,.lbnav{position:absolute;width:46px;height:46px;border:1px solid #fff4;background:#ffffff1a;color:#fff;border-radius:50%;cursor:pointer;font-size:1.5rem;line-height:1}
+.lbx{top:calc(12px + env(safe-area-inset-top,0px));right:12px}
+.lbnav{top:50%;translate:0 -50%}.lbp{left:12px}.lbnx{right:12px}
+.lbx:hover,.lbnav:hover{background:#ffffff33}
+.grid .card{cursor:zoom-in}
+.card:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.lbw .card,.lb-halo,#lb{animation:none!important}}
+@media (prefers-reduced-motion:reduce){body::before,#packZone::before,.pack::after,h1,section,.grid .item,.card,#preview .card,.flip.charge,.flip .front .card{animation:none!important}.ring,.rays,.drop{display:none}}
+
+/* créer */
+.make{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:start}
+@media (max-width:700px){.make{grid-template-columns:1fr}.make .card{margin:0 auto}}
+form{display:grid;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+label{display:grid;gap:5px;font-weight:700;font-size:.9rem}
+input,select,textarea{font:400 1rem var(--sans);padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+textarea{min-height:90px;resize:vertical}
+</style>
+</head>
+<body>
+<main>
+  <h1>Booster perso</h1>
+  <nav role="tablist">
+    <button role="tab" data-tab="tirer" aria-selected="true">Tirer</button>
+    <button role="tab" data-tab="collection" aria-selected="false">Mes cartes</button>
+    <button role="tab" data-tab="creer" aria-selected="false">Créer une carte</button>
+  </nav>
+
+  <section id="tirer">
+    <div class="stage">
+      <div id="packZone">
+        <button class="pack" id="pack" aria-label="Ouvrir un booster">
+          <i class="flap"></i><span class="pk-emoji">🃏</span><span class="pk-name">Booster</span><span class="pk-sub">5 cartes</span>
+        </button>
+      </div>
+      <div class="fan" id="fan" hidden tabindex="0" role="button" aria-label="Révéler la carte suivante"></div>
+      <p class="mute" id="info">Clique sur le booster pour l’ouvrir.</p>
+      <button class="btn" id="again" hidden>Ouvrir un autre booster</button>
+      <div class="row" id="row"></div>
+    </div>
+  </section>
+
+  <section id="collection" hidden>
+    <div class="seg" role="group" aria-label="Affichage">
+      <button type="button" data-v="owned" aria-pressed="true">Obtenues</button>
+      <button type="button" data-v="made" aria-pressed="false">Créées</button>
+    </div>
+    <div class="tools">
+      <input id="qs" type="search" placeholder="Rechercher un nom…" aria-label="Rechercher">
+      <select id="fr" aria-label="Rareté"><option value="">Toutes raretés</option></select>
+      <select id="ft" aria-label="Type"><option value="">Tous types</option></select>
+      <select id="so" aria-label="Tri"><option value="new">Plus récentes</option><option value="old">Plus anciennes</option><option value="nom">Nom A → Z</option><option value="rar+">Rareté croissante</option><option value="rar-">Rareté décroissante</option></select>
+    </div>
+    <div class="share" id="shareBox">
+      <div id="outBox" hidden>
+        <label>Code de « <span id="outName"></span> »
+          <textarea id="out" readonly rows="3" onfocus="this.select()"></textarea>
+        </label>
+        <p class="mute" id="outMsg"></p>
+      </div>
+      <label>Importer une carte avec un code
+        <textarea id="inp" rows="2" placeholder="TCG1-…"></textarea>
+      </label>
+      <div class="row2"><button class="btn" id="imp" type="button">Importer la carte</button><span class="mute" id="impMsg"></span></div>
+    </div>
+    <p class="mute" id="count"></p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="creer" hidden>
+    <div class="make">
+      <form id="form">
+        <label>Nom
+          <input id="nom" maxlength="32" required placeholder="Dragon des brumes">
+        </label>
+        <label>Rareté
+          <select id="rar">
+            <option value="commune">Commune</option>
+            <option value="rare">Rare</option>
+            <option value="epique">Épique</option>
+            <option value="legendaire">Légendaire</option>
+          </select>
+        </label>
+        <label>Type (cadre de la carte)
+          <select id="type"></select>
+        </label>
+        <label>Image
+          <input id="img" type="file" accept="image/*">
+        </label>
+        <div id="cropBox" hidden>
+          <canvas id="crop" width="240" height="160"></canvas>
+          <label>Zoom<input id="zoom" type="range" min="1" max="3" step="0.01" value="1"></label>
+          <p class="mute">Glisse l’image pour choisir la zone visible.</p>
+        </div>
+        <label>Description
+          <textarea id="desc" maxlength="160" placeholder="Une courte description ou un effet…"></textarea>
+        </label>
+        <div class="acts"><button class="btn" id="save" type="submit">Enregistrer la carte</button><button class="btn ghost" id="cancel" type="button" hidden>Annuler</button></div>
+      </form>
+      <div id="preview"></div>
+    </div>
+  </section>
+</main>
+<div id="lb" hidden role="dialog" aria-modal="true" aria-label="Carte en grand">
+  <button class="lbx" id="lbx" type="button" aria-label="Fermer">✕</button>
+  <button class="lbnav lbp" id="lbp" type="button" aria-label="Carte précédente">‹</button>
+  <div class="lbw" id="lbw"></div>
+  <button class="lbnav lbnx" id="lbnx" type="button" aria-label="Carte suivante">›</button>
+  <p id="lbcap"></p>
+  <p id="lbn"></p>
+</div>
+
+<script>
+const RAR={commune:{l:"Commune",w:60},rare:{l:"Rare",w:25},epique:{l:"Épique",w:11},legendaire:{l:"Légendaire",w:4}};
+const TYPES={neutre:{l:"Neutre",i:""},feu:{l:"Feu",i:"🔥",c:"#e0502a"},eau:{l:"Eau",i:"💧",c:"#2a8fe0"},nature:{l:"Nature",i:"🌿",c:"#3aa24a"},ombre:{l:"Ombre",i:"🌙",c:"#5a4a8a"},lumiere:{l:"Lumière",i:"✨",c:"#d9b43a"}};
+const KEY="tcg-cartes-v1",OKEY="tcg-owned-v1";
+let cards=[],hist=[],draws=0,imgData="",owned={},view="owned";
+function saveOwned(){try{localStorage.setItem(OKEY,JSON.stringify(owned))}catch(e){}}
+
+function load(){
+  try{const r=localStorage.getItem(KEY);if(r)cards=JSON.parse(r)}catch(e){}
+  try{owned=JSON.parse(localStorage.getItem(OKEY))||{}}catch(e){owned={}}
+  if(!Array.isArray(cards))cards=[];
+  const n=cards.length;
+  cards=cards.filter(c=>![1,2,3,4].includes(c.id));
+  if(cards.length!==n)save();
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(cards))}catch(e){alert("Stockage plein : supprime des cartes ou utilise des images plus petites.")}}
+
+function cardEl(c){
+  const d=document.createElement("div");d.className="card";d.dataset.r=c.rar;
+  const top=document.createElement("div");top.className="top";
+  const n=document.createElement("span");n.className="nom";n.textContent=c.nom||"Sans nom";top.append(n);
+  if(c.type&&TYPES[c.type]&&c.type!=="neutre"){d.dataset.t=c.type;d.style.setProperty("--tc",TYPES[c.type].c);const ty=document.createElement("span");ty.className="ty";ty.textContent=TYPES[c.type].i;ty.title=TYPES[c.type].l;top.append(ty)}
+  const art=document.createElement("div");art.className="art";
+  if(c.img)art.style.backgroundImage="url("+c.img+")";else art.textContent=c.emoji||"❔";
+  const r=document.createElement("div");r.className="rar";r.textContent=RAR[c.rar].l;
+  const ds=document.createElement("div");ds.className="desc";ds.textContent=c.desc||"";
+  d.append(top,art,r,ds);return d;
+}
+
+function pick(list=cards){
+  const rars=[...new Set(list.map(c=>c.rar))];
+  const tot=rars.reduce((s,r)=>s+RAR[r].w,0);
+  let x=Math.random()*tot,rar=rars[0];
+  for(const r of rars){x-=RAR[r].w;if(x<=0){rar=r;break}}
+  const pool=list.filter(c=>c.rar===rar);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+const q=id=>document.getElementById(id);
+const pack=q("pack"),fan=q("fan"),row=q("row"),again=q("again"),info=q("info");
+const ORDER=["commune","rare","epique","legendaire"];
+let hand=[],pos=0,busy=false;
+
+function makeBooster(){
+  const o=[];for(let i=0;i<4;i++)o.push(pick());
+  const hi=cards.filter(c=>c.rar!=="commune");
+  o.push(hi.length?pick(hi):pick());
+  return o.sort((a,b)=>ORDER.indexOf(a.rar)-ORDER.indexOf(b.rar));
+}
+pack.onclick=()=>{
+  if(busy)return;
+  if(!cards.length){info.textContent="Crée d’abord des cartes pour ouvrir un booster.";return}
+  busy=true;info.textContent="";
+  pack.classList.add("shake");
+  setTimeout(()=>{pack.classList.remove("shake");pack.classList.add("opening");flash("#fff",.8);burst()},800);
+  setTimeout(()=>{q("packZone").hidden=true;pack.classList.remove("opening");deal();busy=false},1500);
+};
+function deal(){
+  hand=makeBooster();pos=0;row.replaceChildren();again.hidden=true;
+  fan.replaceChildren();fan.hidden=false;
+  hand.forEach((c,i)=>{
+    const f=document.createElement("div");f.className="flip";
+    f.innerHTML='<div><div class="face"><div class="dos">🂠</div></div><div class="face front"></div></div>';
+    f.querySelector(".front").append(cardEl(c));
+    f.style.zIndex=hand.length-i;
+    f.style.setProperty("--t","translate("+i*5+"px,"+i*-5+"px) rotate("+(i%2?1:-1)*i*1.2+"deg)");
+    f.style.setProperty("--d",(hand.length-1-i)*120+"ms");
+    fan.append(f);
+  });
+  info.textContent="Carte 1/"+hand.length+" : clique sur la pile pour la révéler";
+}
+function step(){
+  if(busy||!hand.length||pos>=hand.length)return;
+  const f=fan.firstElementChild,c=hand[pos];
+  busy=true;
+  if(!f.classList.contains("open")){
+    const n=owned[c.id]=(owned[c.id]||0)+1;saveOwned();
+    const pre={rare:500,epique:900,legendaire:1300}[c.rar]||0;
+    if(pre){f.dataset.r=c.rar;f.classList.add("charge")}
+    setTimeout(()=>{f.classList.remove("charge");f.classList.add("open")},pre);
+    setTimeout(()=>{
+      effect(f,c.rar);busy=false;
+      info.textContent=c.nom+" · "+RAR[c.rar].l+(n===1?" · Nouvelle carte !":" · ×"+n)+" : clique pour "+(pos<hand.length-1?"la suite":"terminer");
+    },650+pre);
+  }else{
+    f.classList.add("gone");
+    const m=document.createElement("div");m.className="mini";m.append(cardEl(c));row.append(m);
+    pos++;
+    setTimeout(()=>{
+      f.remove();busy=false;
+      if(pos>=hand.length){fan.hidden=true;again.hidden=false;info.textContent="Booster terminé ! Voici tes 5 cartes."}
+      else info.textContent="Carte "+(pos+1)+"/"+hand.length+" : clique sur la pile pour la révéler";
+    },450);
+  }
+}
+fan.onclick=step;
+fan.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();step()}};
+again.onclick=()=>{row.replaceChildren();again.hidden=true;q("packZone").hidden=false;info.textContent="Clique sur le booster pour l’ouvrir."};
+
+function flash(col,a){
+  const d=document.createElement("div");d.className="flash";
+  d.style.background="radial-gradient(circle,"+col+" 0%,transparent 70%)";d.style.setProperty("--a",a);
+  document.body.append(d);setTimeout(()=>d.remove(),1000);
+}
+function sparks(f,col,n){
+  for(let i=0;i<n;i++){
+    const s=document.createElement("span"),a=Math.random()*6.283,d=100+Math.random()*120;
+    s.className="spark";s.style.background=col||"hsl("+Math.random()*360+",90%,65%)";
+    s.style.setProperty("--dx",Math.cos(a)*d+"px");s.style.setProperty("--dy",Math.sin(a)*d+"px");
+    f.append(s);setTimeout(()=>s.remove(),1000);
+  }
+}
+function effect(f,r){
+  const col={rare:"#2f7fe0",epique:"#9a45e0",legendaire:"#e0a21a"}[r];
+  if(!col)return;
+  f.classList.add("fx-"+r);
+  flash(col,r==="rare"?.35:r==="epique"?.55:.85);
+  ring(f,col);if(r!=="rare"){sparks(f,col,r==="legendaire"?34:16);rays(f,col,r)}if(r==="legendaire")rain();
+  if(r==="legendaire"){document.body.classList.add("quake");setTimeout(()=>document.body.classList.remove("quake"),600)}
+}
+
+const rk=c=>ORDER.indexOf(c.rar);
+function renderGrid(){
+  const g=q("grid");g.replaceChildren();g.classList.toggle("enter",enter);enter=false;
+  q("shareBox").hidden=view!=="made";
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===view));
+  const s=q("qs").value.trim().toLowerCase(),fr=q("fr").value,ft=q("ft").value,so=q("so").value;
+  let list=view==="owned"?cards.filter(c=>owned[c.id]):cards.slice();
+  const total=list.length;
+  list=list.filter(c=>(!s||c.nom.toLowerCase().includes(s))&&(!fr||c.rar===fr)&&(!ft||(c.type||"neutre")===ft));
+  list.sort((a,b)=>so==="old"?a.id-b.id:so==="nom"?a.nom.localeCompare(b.nom,"fr"):so==="rar+"?rk(a)-rk(b)||b.id-a.id:so==="rar-"?rk(b)-rk(a)||b.id-a.id:b.id-a.id);
+  q("count").textContent=(view==="owned"?total+" / "+cards.length+" cartes obtenues":total+" cartes créées")+(list.length!==total?" ("+list.length+" affichées)":"");
+  if(!list.length){const p=document.createElement("p");p.className="mute";p.textContent=view==="owned"&&!total?"Aucune carte obtenue pour l’instant : ouvre un booster !":"Aucune carte ne correspond.";g.append(p);return}
+  lastList=list;
+  list.forEach((c,i)=>{
+    const w=document.createElement("div");w.className="item";w.style.setProperty("--i",Math.min(i,14));const ce=cardEl(c);w.append(ce);
+    ce.tabIndex=0;ce.setAttribute("role","button");ce.setAttribute("aria-label","Agrandir "+c.nom);
+    ce.onclick=()=>openLb(i,ce);ce.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openLb(i,ce)}};
+    if(view==="owned"){
+      if(owned[c.id]>1){const bd=document.createElement("span");bd.className="cnt";bd.textContent="×"+owned[c.id];ce.append(bd)}
+      g.append(w);return;
+    }
+    const mk=(t,f)=>{const b=document.createElement("button");b.className="btn ghost";b.textContent=t;b.onclick=()=>f(b);return b};
+    const bar=document.createElement("div");bar.style.cssText="display:flex;gap:6px;flex-wrap:wrap;justify-content:center";
+    bar.append(mk("Modifier",()=>editCard(c)),mk("Partager",()=>showCode(c)),mk("Supprimer",b=>{
+      if(b.dataset.sure){cards=cards.filter(x=>x.id!==c.id);delete owned[c.id];save();saveOwned();renderGrid();return}
+      b.dataset.sure="1";b.textContent="Confirmer ?";
+      setTimeout(()=>{delete b.dataset.sure;b.textContent="Supprimer"},3000);
+    }));
+    w.append(bar);g.append(w);
+  });
+}
+
+// création
+const $=id=>document.getElementById(id);
+function renderPreview(){
+  $("preview").replaceChildren(cardEl({nom:$("nom").value||"Nom de la carte",rar:$("rar").value,type:$("type").value,desc:$("desc").value||"Description…",img:imgData,emoji:"🖼️"}));
+}
+["nom","rar","type","desc"].forEach(i=>$(i).addEventListener("input",renderPreview));
+// recadrage : l'image est déplacée/zoomée dans un canvas 240×160 (taille de l'image exportée)
+let editingId=null,cim=null,zoom=1,ox=0,oy=0,drag=null;
+const cv=$("crop"),cx=cv.getContext("2d");
+function drawCrop(){
+  const W=240,H=160,b=Math.max(W/cim.width,H/cim.height)*zoom,w=cim.width*b,h=cim.height*b;
+  ox=Math.min(0,Math.max(W-w,ox));oy=Math.min(0,Math.max(H-h,oy));
+  cx.clearRect(0,0,W,H);cx.drawImage(cim,ox,oy,w,h);
+  imgData=cv.toDataURL("image/jpeg",.7);renderPreview();
+}
+$("img").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const im=new Image();
+    im.onload=()=>{
+      cim=im;zoom=1;$("zoom").value=1;
+      const b=Math.max(240/im.width,160/im.height);ox=(240-im.width*b)/2;oy=(160-im.height*b)/2;
+      $("cropBox").hidden=false;drawCrop();
+    };
+    im.src=fr.result;
+  };
+  fr.readAsDataURL(f);
+});
+$("zoom").addEventListener("input",e=>{
+  if(!cim)return;
+  const b0=Math.max(240/cim.width,160/cim.height),fx=(120-ox)/(cim.width*b0*zoom),fy=(80-oy)/(cim.height*b0*zoom);
+  zoom=+e.target.value;ox=120-fx*cim.width*b0*zoom;oy=80-fy*cim.height*b0*zoom;drawCrop();
+});
+cv.addEventListener("pointerdown",e=>{if(!cim)return;drag={x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId)});
+cv.addEventListener("pointermove",e=>{
+  if(!drag)return;const k=240/cv.getBoundingClientRect().width;
+  ox+=(e.clientX-drag.x)*k;oy+=(e.clientY-drag.y)*k;drag={x:e.clientX,y:e.clientY};drawCrop();
+});
+["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>drag=null));
+function resetForm(){
+  $("form").reset();imgData="";editingId=null;cim=null;$("cropBox").hidden=true;
+  $("save").textContent="Enregistrer la carte";$("cancel").hidden=true;renderPreview();
+}
+function editCard(c){
+  editingId=c.id;cim=null;$("cropBox").hidden=true;$("img").value="";
+  $("nom").value=c.nom;$("rar").value=c.rar;$("type").value=c.type||"neutre";$("desc").value=c.desc;imgData=c.img;
+  $("save").textContent="Enregistrer les modifications";$("cancel").hidden=false;
+  show("creer");
+}
+$("cancel").onclick=()=>{resetForm();view="made";show("collection")};
+$("form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const f={nom:$("nom").value.trim(),rar:$("rar").value,type:$("type").value,desc:$("desc").value.trim(),img:imgData};
+  let nc=cards.find(c=>c.id===editingId);
+  if(nc)Object.assign(nc,f);else{nc={id:Date.now(),...f,emoji:"🖼️"};cards.push(nc)}
+  save();resetForm();view="made";show("collection");showCode(nc);
+});
+
+// codes de partage (la carte entière est encodée dans le code)
+const b64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")};
+const unb64=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return Uint8Array.from(atob(s),c=>c.charCodeAt(0))};
+async function pipe(u,Ctor){return new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(new Ctor("deflate-raw"))).arrayBuffer())}
+async function encode(c){
+  const t=c.type&&c.type!=="neutre"?[c.type]:[];
+  const raw=new TextEncoder().encode(JSON.stringify([c.nom,c.rar,c.desc,c.img,...t]));
+  if(typeof CompressionStream==="undefined")return "TCG0-"+b64(raw);
+  return "TCG1-"+b64(await pipe(raw,CompressionStream));
+}
+async function decode(code){
+  const m=code.trim().replace(/\s+/g,"").match(/^TCG([01])-(.+)$/);if(!m)throw 0;
+  let u=unb64(m[2]);
+  if(m[1]==="1")u=await pipe(u,DecompressionStream);
+  const [nom,rar,desc,img,type]=JSON.parse(new TextDecoder().decode(u));
+  if(!RAR[rar]||typeof nom!=="string"||!nom)throw 0;
+  const ok=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]*$/.test(img||"");
+  return {id:Date.now()+Math.floor(Math.random()*1000),nom:nom.slice(0,32),rar,desc:String(desc||"").slice(0,160),img:ok?img:"",type:TYPES[type]?type:"neutre",emoji:"🖼️"};
+}
+async function showCode(c){
+  const code=await encode(c);
+  q("outBox").hidden=false;q("outName").textContent=c.nom;q("out").value=code;
+  let ok=false;try{await navigator.clipboard.writeText(code);ok=true}catch(e){}
+  q("outMsg").textContent=(ok?"Code copié ! ":"Copie ce code. ")+"Sur un autre appareil, colle-le dans « Importer une carte » (onglet Mes cartes).";
+}
+q("imp").onclick=async()=>{
+  const msg=q("impMsg");
+  try{
+    const c=await decode(q("inp").value);
+    if(cards.some(x=>x.nom===c.nom&&x.rar===c.rar&&x.desc===c.desc&&x.img===c.img&&(x.type||"neutre")===c.type)){msg.textContent="Cette carte est déjà dans ta collection.";return}
+    cards.push(c);save();renderGrid();q("inp").value="";msg.textContent="« "+c.nom+" » ajoutée !";
+  }catch(e){msg.textContent="Code invalide : vérifie qu’il est complet."}
+};
+
+// animations
+let enter=false;
+function ring(f,col){const e=document.createElement("i");e.className="ring";e.style.setProperty("--rc2",col);f.append(e);setTimeout(()=>e.remove(),1000)}
+function rays(f,col,r){const e=document.createElement("i");e.className="rays";e.style.setProperty("--rc2",col+"cc");e.style.setProperty("--dur",r==="legendaire"?"2.4s":"1.6s");f.append(e);setTimeout(()=>e.remove(),2500)}
+function rain(){
+  for(let i=0;i<46;i++){
+    const s=document.createElement("span");s.className="drop";
+    s.style.left=Math.random()*100+"vw";s.style.background="hsl("+(38+Math.random()*20)+",95%,"+(55+Math.random()*20)+"%)";
+    s.style.animationDuration=(1.4+Math.random()*1.4)+"s";s.style.animationDelay=Math.random()*.6+"s";
+    s.style.setProperty("--r",(Math.random()*720-360)+"deg");
+    document.body.append(s);setTimeout(()=>s.remove(),3300);
+  }
+}
+function burst(){
+  const z=q("packZone");
+  ["ring","rays"].forEach(k=>{const e=document.createElement("i");e.className=k;z.append(e);setTimeout(()=>e.remove(),1200)});
+  sparks(z,null,46);
+}
+document.addEventListener("pointermove",e=>{
+  const c=e.target.closest&&e.target.closest(".card");if(!c||c.closest(".mini"))return;
+  const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+  c.style.setProperty("--mx",x*100+"%");c.style.setProperty("--my",y*100+"%");
+  c.style.setProperty("--rx",(.5-y)*14+"deg");c.style.setProperty("--ry",(x-.5)*14+"deg");
+});
+document.addEventListener("pointerout",e=>{
+  const c=e.target.closest&&e.target.closest(".card");
+  if(c&&!c.contains(e.relatedTarget)){c.style.setProperty("--rx","0deg");c.style.setProperty("--ry","0deg")}
+});
+
+// vue agrandie d'une carte
+let lastList=[],lbIdx=0,lbBack=null;
+const lb=q("lb"),RM=matchMedia("(prefers-reduced-motion:reduce)");
+function openLb(i,src){
+  lbIdx=i;lbBack=document.activeElement;
+  lb.hidden=false;document.documentElement.style.overflow="hidden";
+  showLb(lastList[i],src,0);q("lbx").focus({preventScroll:true});
+}
+function showLb(c,src,dir){
+  const w=q("lbw"),k=Math.min(innerWidth*.86/220,innerHeight*.62/308,1.9);
+  w.replaceChildren();w.style.setProperty("--k",k);w.style.margin=154*(k-1)+"px "+110*(k-1)+"px";
+  const col={rare:"#2f7fe0",epique:"#9a45e0",legendaire:"#e0a21a"}[c.rar];
+  if(col){const h=document.createElement("i");h.className="lb-halo";h.style.setProperty("--rc2",col+"aa");w.append(h)}
+  w.append(cardEl(c));
+  q("lbcap").textContent=c.nom+" · "+RAR[c.rar].l+(c.type&&c.type!=="neutre"?" · "+TYPES[c.type].l:"")+(view==="owned"&&owned[c.id]>1?" · ×"+owned[c.id]:"");
+  q("lbn").textContent=(lbIdx+1)+" / "+lastList.length;
+  q("lbp").hidden=q("lbnx").hidden=lastList.length<2;
+  if(RM.matches)return;
+  if(src){
+    const r=src.getBoundingClientRect(),cr=w.getBoundingClientRect();
+    const dx=(r.left+r.width/2-cr.left-cr.width/2)/k,dy=(r.top+r.height/2-cr.top-cr.height/2)/k,s=r.width/cr.width;
+    w.animate([{transform:"perspective(900px) translate("+dx+"px,"+dy+"px) scale("+s+") rotateY(-35deg)"},{transform:"none"}],{duration:560,easing:"cubic-bezier(.2,.9,.3,1.12)"});
+  }else w.animate([{transform:"perspective(900px) translateX("+dir*70+"px) rotateY("+dir*-40+"deg)",opacity:0},{transform:"none",opacity:1}],{duration:420,easing:"cubic-bezier(.2,.9,.3,1.1)"});
+  if(col)setTimeout(()=>{
+    if(lb.hidden||lastList[lbIdx]!==c)return;
+    ring(w,col);flash(col,.4);
+    if(c.rar!=="rare"){sparks(w,col,c.rar==="legendaire"?30:14);rays(w,col,c.rar)}
+    if(c.rar==="legendaire")rain();
+  },src?420:260);
+}
+function closeLb(){lb.hidden=true;document.documentElement.style.overflow="";if(lbBack&&lbBack.focus)lbBack.focus({preventScroll:true})}
+function navLb(d){if(lastList.length<2)return;lbIdx=(lbIdx+d+lastList.length)%lastList.length;showLb(lastList[lbIdx],null,d)}
+q("lbx").onclick=closeLb;q("lbp").onclick=()=>navLb(-1);q("lbnx").onclick=()=>navLb(1);
+lb.addEventListener("click",e=>{if(!e.target.closest(".lbw,.lbx,.lbnav"))closeLb()});
+document.addEventListener("keydown",e=>{
+  if(lb.hidden)return;
+  if(e.key==="Escape")closeLb();else if(e.key==="ArrowRight")navLb(1);else if(e.key==="ArrowLeft")navLb(-1);
+});
+let tx0=null;
+lb.addEventListener("touchstart",e=>{tx0=e.touches[0].clientX},{passive:true});
+lb.addEventListener("touchend",e=>{if(tx0===null)return;const d=e.changedTouches[0].clientX-tx0;tx0=null;if(Math.abs(d)>60)navLb(d<0?1:-1)});
+
+// filtres, vues et listes déroulantes
+Object.entries(TYPES).forEach(([k,t])=>[q("type"),q("ft")].forEach(s=>s.add(new Option((t.i?t.i+" ":"")+t.l,k))));
+Object.entries(RAR).forEach(([k,r])=>q("fr").add(new Option(r.l,k)));
+["qs","fr","ft","so"].forEach(i=>q(i).addEventListener("input",renderGrid));
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{view=b.dataset.v;enter=true;renderGrid()});
+
+// onglets
+function show(name){
+  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name));
+  ["tirer","collection","creer"].forEach(s=>$(s).hidden=s!==name);
+  if(name==="collection"){enter=true;renderGrid()}
+  if(name==="creer")renderPreview();
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.tab));
+load();renderPreview();
+</script>
+</body>
+</html>

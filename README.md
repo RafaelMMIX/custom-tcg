@@ -17,10 +17,12 @@ Les cartes que vous choisissez de rendre **publiques** rejoignent la galerie [Ca
 - [Utilisation](#utilisation)
   - [Créer une carte](#créer-une-carte)
   - [Ouvrir un booster](#ouvrir-un-booster)
+  - [Créer ses boosters](#créer-ses-boosters)
   - [Gérer sa collection](#gérer-sa-collection)
   - [Sauvegarder sa collection](#sauvegarder-sa-collection)
   - [Partager une carte](#partager-une-carte)
   - [Publier une carte sur NSI Hub](#publier-une-carte-sur-nsi-hub)
+  - [Publier un booster sur NSI Hub](#publier-un-booster-sur-nsi-hub)
 - [Règles du jeu](#règles-du-jeu)
 - [Données et stockage](#données-et-stockage)
 - [Format des codes de partage](#format-des-codes-de-partage)
@@ -38,6 +40,7 @@ Les cartes que vous choisissez de rendre **publiques** rejoignent la galerie [Ca
 - 🎨 **Création de cartes** : nom, rareté, type (élément), image recadrable et description, avec un aperçu en direct.
 - 💎 **7 raretés** : Commune, Rare, Épique, Légendaire, Super légendaire, Mythique et Perdue, chacune avec son apparence.
 - 🃏 **Boosters de 5 cartes** : tirage pondéré par la rareté, avec au moins une carte Rare ou mieux par booster.
+- 🎁 **Boosters personnalisés** : rangez vos cartes dans des boosters (nom, emoji, couleur), ouvrez celui de votre choix, publiez-les sur NSI Hub et ouvrez ceux des autres.
 - ✨ **Animations de révélation** : retournement des cartes, aura de « charge » de plus en plus longue avant une carte rare, éclairs, étincelles, rayons, pluie dorée, secousse de l'écran… et une mise en scène propre à chaque rareté supérieure (braises rouges, étoiles en orbite, voile d'obscurité et feux follets).
 - 📚 **Collection** : deux vues (cartes *obtenues* et cartes *créées*), avec recherche, filtres par rareté et par type, tri et compteur de doublons.
 - 🔍 **Vue agrandie** : carte en grand avec navigation au clavier, par boutons ou par balayage sur mobile.
@@ -66,7 +69,7 @@ C'est tout. Il n'y a ni dépendance à installer ni étape de compilation.
 
 ## Utilisation
 
-L'application comporte trois onglets : **Tirer**, **Mes cartes** et **Créer une carte**.
+L'application comporte quatre onglets : **Tirer**, **Mes cartes**, **Boosters** et **Créer une carte**.
 
 ### Créer une carte
 
@@ -90,14 +93,29 @@ Pour modifier une carte existante : **Mes cartes → Créées → Modifier**.
 
 Dans l'onglet **Tirer** :
 
-1. Cliquez sur le **booster** pour l'ouvrir.
-2. Cliquez sur la pile, ou appuyez sur `Entrée` ou `Espace`, pour **révéler** la carte du dessus.
-3. Cliquez de nouveau pour la **mettre de côté** et passer à la suivante.
-4. À la fin, les 5 cartes s'affichent ensemble. Cliquez sur **Ouvrir un autre booster** pour recommencer.
+1. Si vous avez des boosters personnalisés, choisissez celui à ouvrir au-dessus du booster (ou « Toutes mes cartes »).
+2. Cliquez sur le **booster** pour l'ouvrir.
+3. Cliquez sur la pile, ou appuyez sur `Entrée` ou `Espace`, pour **révéler** la carte du dessus.
+4. Cliquez de nouveau pour la **mettre de côté** et passer à la suivante.
+5. À la fin, les 5 cartes s'affichent ensemble. Cliquez sur **Ouvrir un autre booster** pour recommencer.
 
 Les cartes sont révélées de la plus commune à la plus rare : la meilleure arrive toujours en dernier. Chaque carte révélée rejoint votre collection, et un message indique s'il s'agit d'une **nouvelle carte** ou d'un doublon (×2, ×3…).
 
-> ⚠️ Une carte ne peut sortir d'un booster que si elle existe dans votre collection : créez au moins une carte de chaque rareté que vous voulez pouvoir tirer.
+> ⚠️ Une carte ne peut sortir d'un booster que si elle en fait partie : créez au moins une carte de chaque rareté que vous voulez pouvoir tirer.
+
+### Créer ses boosters
+
+Dans l'onglet **Boosters**, cliquez sur **＋ Nouveau booster** :
+
+- donnez-lui un **nom** (32 caractères maximum), un **emoji** et une **couleur** (10 couleurs proposées ou une couleur personnalisée) : l'aperçu montre le booster tel qu'il apparaîtra ;
+- cochez les **cartes** qui en font partie. Un filtre par rareté et les boutons **Tout cocher** / **Tout décocher** aident à aller vite. Le compteur indique le nombre de cartes et de raretés couvertes.
+
+Une même carte peut faire partie de plusieurs boosters. Chaque booster de la liste peut être **ouvert**, **modifié**, **publié** ou **supprimé**. Supprimer un booster ne supprime pas ses cartes.
+
+Deux raccourcis :
+
+- dans **Créer une carte**, le champ **Ajouter au booster** range directement la nouvelle carte dans un booster ;
+- dans **Mes cartes**, le filtre **Tous les boosters** affiche seulement les cartes d'un booster.
 
 ### Gérer sa collection
 
@@ -126,7 +144,7 @@ Cliquez sur une carte pour l'afficher **en grand**. Dans cette vue :
 
 Les cartes sont enregistrées dans le navigateur : vider ses données ou changer d'appareil les efface. Pour ne rien perdre, utilisez le panneau **💾 Sauvegarde de la collection** de l'onglet **Mes cartes** :
 
-- **Exporter ma collection** télécharge un fichier `booster-perso-AAAA-MM-JJ.json` contenant toutes vos cartes créées et vos cartes obtenues (avec leurs exemplaires).
+- **Exporter ma collection** télécharge un fichier `booster-perso-AAAA-MM-JJ.json` contenant toutes vos cartes créées, vos cartes obtenues (avec leurs exemplaires) et vos boosters.
 - **Restaurer une sauvegarde** réimporte ce fichier. Les cartes sont **fusionnées** avec la collection actuelle : rien n'est supprimé, les doublons sont ignorés et les compteurs d'exemplaires sont conservés.
 
 Le jeu demande aussi au navigateur un **stockage persistant**, ce qui réduit le risque qu'il efface les données de lui-même.
@@ -149,6 +167,18 @@ Une carte publique est proposée à la galerie [Cartes communautaires](https://r
 4. Rafael vérifie la carte. S'il l'approuve, elle est ajoutée automatiquement à la galerie et vous recevez une réponse sur la demande.
 
 Évitez d'utiliser votre nom complet comme pseudo : il est affiché publiquement sous la carte.
+
+### Publier un booster sur NSI Hub
+
+Un booster publié apparaît dans la section **Boosters de la communauté** de NSI Hub, où chacun peut voir ses cartes et l'**ouvrir** dans Booster perso. Conditions :
+
+- au moins **10 cartes** ;
+- au moins **une carte de chaque rareté** (de Commune à Perdue) ;
+- **toutes ses cartes déjà publiques** sur NSI Hub.
+
+Dans **Boosters → Publier**, une liste de vérification indique ce qui manque. Les cartes pas encore publiques sont listées avec un bouton **Publier** ; une fois qu'elles ont été validées, cliquez sur **Actualiser**. Quand tout est vert, **Envoyer le booster sur GitHub** ouvre une demande déjà remplie : le code du booster est court, car il ne contient que la liste des cartes. Après validation par Rafael, le booster est ajouté automatiquement.
+
+Sur NSI Hub, le bouton **Ouvrir le booster** ouvre Booster perso et y ajoute le booster avec ses cartes (sans créer de doublons si vous les avez déjà). Il apparaît avec la mention « de NSI Hub » et peut être ouvert tout de suite.
 
 ---
 
@@ -186,7 +216,9 @@ Toutes les données restent **dans votre navigateur**, dans le `localStorage` :
 |---|---|
 | `tcg-cartes-v1` | La liste des cartes créées ou importées (nom, rareté, type, description, image en base64). |
 | `tcg-owned-v1` | Les cartes obtenues et leur nombre d'exemplaires. |
-| `tcg-pseudo-v1` | Le dernier pseudo utilisé pour publier une carte. |
+| `tcg-boosters-v1` | Les boosters personnalisés (nom, emoji, couleur, cartes). |
+| `tcg-bsel-v1` | Le dernier booster choisi dans l'onglet Tirer. |
+| `tcg-pseudo-v1` | Le dernier pseudo utilisé pour publier une carte ou un booster. |
 
 Conséquences :
 
@@ -194,7 +226,7 @@ Conséquences :
 - vider les données du site, ou naviguer en mode privé, **efface la collection** : exportez-la régulièrement ;
 - le `localStorage` est limité à environ 5 Mo par site selon les navigateurs. Les images sont compressées en JPEG (240 × 160 px, qualité 70 %) pour en stocker un maximum. Si l'espace manque, un message vous invite à supprimer des cartes.
 
-Seules les cartes que vous publiez vous-même quittent votre navigateur : elles sont envoyées sur GitHub, avec votre pseudo, quand vous validez la demande.
+Seules les cartes et les boosters que vous publiez vous-même quittent votre navigateur : ils sont envoyés sur GitHub, avec votre pseudo, quand vous validez la demande.
 
 ---
 
@@ -216,6 +248,14 @@ Une fois décodées, les données forment un tableau JSON :
 Le type est omis pour une carte Neutre. À l'import, l'application vérifie chaque champ : rareté connue, nom non vide, longueurs maximales, image limitée aux formats `data:image/jpeg|png|webp`, et type connu (sinon *Neutre*).
 
 Les clés de rareté sont : `commune`, `rare`, `epique`, `legendaire`, `superlegendaire`, `mythique`, `perdue`.
+
+Un **code de booster** suit le même principe avec le préfixe `BST1-` (ou `BST0-`). Une fois décodé :
+
+```json
+{"v": 1, "n": "Nom du booster", "e": "🐍", "c": "#3aa24a", "k": ["cc7a22a99e560518", "…"]}
+```
+
+`k` liste les cartes par leur **identifiant** : les 16 premiers caractères hexadécimaux du SHA-256 de `JSON.stringify([nom, rarete, description, image, type])` (description et image vides si absentes, type `neutre` par défaut). Le même calcul est fait dans Booster perso, sur NSI Hub (`tcg-share.js`) et par le script de publication.
 
 ---
 
@@ -271,7 +311,8 @@ Les polices Cinzel et Nunito sont chargées depuis Google Fonts. Hors ligne, l'a
 - Pas de synchronisation automatique entre appareils : utilisez l'export de la collection ou les codes de partage.
 - Le nombre de cartes stockables dépend de l'espace `localStorage` disponible.
 - Publier une carte nécessite un compte GitHub, et les cartes très lourdes doivent être collées à la main dans la demande.
-- Les cartes publiques de NSI Hub ne sont pas encore tirables dans les boosters : il faut les importer avec leur code.
+- Une carte modifiée après sa publication change d'identifiant : elle ne compte plus comme publique tant que la nouvelle version n'est pas publiée.
+- Publier un booster demande d'abord de publier chacune de ses cartes (une demande par carte).
 - Il n'y a pas de règles de combat : les cartes sont à collectionner, pas à jouer.
 
 ---
@@ -290,7 +331,7 @@ custom-tcg/
 └── tcg-cartes.html    l'application complète (HTML + CSS + JavaScript)
 ```
 
-La galerie communautaire et la publication automatique des cartes se trouvent dans le dépôt [RafaelMMIX/nsi](https://github.com/RafaelMMIX/nsi) (`cartes.html`, `cartes.js`, `tcg-share.js`, `cartes-publiques.json` et `.github/`).
+La galerie communautaire et la publication automatique des cartes et des boosters se trouvent dans le dépôt [RafaelMMIX/nsi](https://github.com/RafaelMMIX/nsi) (`cartes.html`, `cartes.js`, `tcg-share.js`, `cartes-publiques.json`, `boosters-publics.json` et `.github/`).
 
 ---
 
@@ -303,4 +344,4 @@ Les idées et les améliorations sont les bienvenues :
 3. Testez vos modifications en ouvrant `tcg-cartes.html` dans un navigateur.
 4. Ouvrez une *pull request* en décrivant le changement.
 
-Quelques pistes : boosters avec les cartes publiques, échanges entre joueurs, monnaie et boutique, statistiques de tirage, nouveaux types, cartes avec attaque et défense, mode hors ligne (PWA).
+Quelques pistes : versions brillantes des cartes, album à compléter, statistiques de tirage, nouveaux types, cartes avec attaque et défense, mode hors ligne (PWA).

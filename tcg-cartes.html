@@ -248,6 +248,63 @@ section:not([hidden]){animation:fadein .4s ease-out}
 @media (prefers-reduced-motion:reduce){.lbw .card,.lb-halo,#lb{animation:none!important}}
 @media (prefers-reduced-motion:reduce){body::before,#packZone::before,.pack::after,h1,section,.grid .item,.card,#preview .card,.flip.charge,.flip .front .card{animation:none!important}.ring,.rays,.drop,.star,.wisp,.veil{display:none}}
 
+@media (max-width:480px){nav{gap:2px;padding:5px}nav button{padding:8px 11px;font-size:.9rem}nav .long{display:none}}
+
+/* boosters personnalisés */
+.pack[data-custom]{background:linear-gradient(160deg,color-mix(in srgb,var(--pc) 55%,#000) 0%,var(--pc) 45%,color-mix(in srgb,var(--pc) 50%,#fff) 112%)}
+.pack[data-custom] .flap{background:color-mix(in srgb,var(--pc) 70%,#fff);background-image:repeating-linear-gradient(90deg,#fff5 0 2px,transparent 2px 6px)}
+.pk-name{max-width:180px;text-align:center;line-height:1.12;overflow-wrap:anywhere;padding:0 10px;text-shadow:0 2px 8px #0006}
+.bchoice{display:flex;gap:8px;overflow-x:auto;max-width:100%;padding:4px 2px 8px;scrollbar-width:thin}
+.bchoice[hidden]{display:none}
+.bchoice button{flex:none;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 80%,transparent);color:var(--ink);font:700 .9rem var(--sans);cursor:pointer;white-space:nowrap;transition:box-shadow .2s,background .2s}
+.bchoice button[aria-checked="true"]{border-color:var(--bc,var(--accent));box-shadow:0 0 0 2px color-mix(in srgb,var(--bc,var(--accent)) 45%,transparent);background:color-mix(in srgb,var(--bc,var(--accent)) 16%,var(--panel))}
+.bchoice small{color:var(--mute);font-weight:700}
+.bhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.bhead p{margin:0;max-width:540px}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.btile{display:flex;gap:14px;align-items:center;background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 6px 20px rgba(0,0,0,.07)}
+.pkw{flex:none;width:96px;height:139px;position:relative}
+.pkw .pack{position:absolute;left:0;top:0;transform:scale(.48);transform-origin:top left;animation:none;pointer-events:none}
+.pkw .pack::after{animation:none}
+.binfo{display:grid;gap:6px;min-width:0}
+.binfo h3{margin:0;font:800 1rem var(--serif);overflow-wrap:anywhere}
+.binfo p{margin:0;font-size:.85rem}
+.binfo .acts{gap:6px}
+.binfo .btn{padding:6px 10px;font-size:.82rem}
+.dots{display:flex;gap:4px;flex-wrap:wrap}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--line)}
+.dot[data-r="commune"]{--rc:var(--c-commune)}.dot[data-r="rare"]{--rc:var(--c-rare)}.dot[data-r="epique"]{--rc:var(--c-epique)}.dot[data-r="legendaire"]{--rc:var(--c-legendaire)}
+.dot[data-r="superlegendaire"]{--rc:#e8304f}.dot[data-r="mythique"]{--rc:#28c7de}.dot[data-r="perdue"]{--rc:#57e6c9}
+.dot.on{background:var(--rc);box-shadow:0 0 6px var(--rc)}
+.bform-top{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
+@media (max-width:560px){.bform-top{grid-template-columns:1fr}.bform-top .pkw{margin:0 auto}}
+.bfields{display:grid;gap:10px}
+.emojis,.swatches{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.emojis button{font-size:1.2rem;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel);cursor:pointer;padding:0}
+.swatches button{width:32px;height:32px;border-radius:50%;border:3px solid var(--panel);box-shadow:0 0 0 1px var(--line);cursor:pointer;background:var(--sw);padding:0}
+.swatches button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.swatches input[type=color]{width:38px;height:38px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer}
+.lbl{font-weight:700;font-size:.9rem;display:block;margin-bottom:5px}
+.bpick-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bpick-head select{width:auto}
+.bpick-head .btn{padding:6px 12px;font-size:.85rem}
+.bpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;max-height:470px;overflow:auto;padding:6px;border:1px solid var(--line);border-radius:12px}
+.bpick>p{grid-column:1/-1;margin:6px}
+.pk-item{position:relative;width:104px;height:146px;padding:0;border:0;background:none;cursor:pointer;border-radius:10px;justify-self:center;opacity:.5;transition:opacity .2s,transform .15s}
+.pk-item:active{transform:scale(.95)}
+.pk-item .card{transform:scale(.4727);transform-origin:top left;pointer-events:none;animation:none!important}
+.pk-item[aria-pressed="true"]{opacity:1}
+.pk-item::after{content:"";position:absolute;right:3px;top:3px;width:24px;height:24px;border-radius:50%;background:var(--panel);border:2px solid var(--line);z-index:5;display:grid;place-items:center;font:800 .85rem var(--sans);color:#fff}
+.pk-item[aria-pressed="true"]::after{content:"✓";background:var(--accent);border-color:var(--accent)}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.checks li::before{content:"❌ "}.checks li.ok::before{content:"✅ "}
+#bpMissing{display:grid;gap:6px}
+#bpMissing p{margin:0}
+.miss-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;font-size:.88rem}
+.miss-row .btn{padding:5px 10px;font-size:.8rem;flex:none}
+a.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+#addBWrap[hidden],#fb[hidden]{display:none}
+
 /* visibilité privée / publique */
 .vis{border:0;padding:0;margin:0;display:grid;gap:6px}
 .vis legend{font-weight:700;font-size:.9rem;padding:0;margin-bottom:5px}
@@ -303,11 +360,13 @@ textarea{min-height:90px;resize:vertical}
   <nav role="tablist">
     <button role="tab" data-tab="tirer" aria-selected="true">Tirer</button>
     <button role="tab" data-tab="collection" aria-selected="false">Mes cartes</button>
-    <button role="tab" data-tab="creer" aria-selected="false">Créer une carte</button>
+    <button role="tab" data-tab="boosters" aria-selected="false">Boosters</button>
+    <button role="tab" data-tab="creer" aria-selected="false">Créer<span class="long"> une carte</span></button>
   </nav>
 
   <section id="tirer">
     <div class="stage">
+      <div class="bchoice" id="bchoice" role="radiogroup" aria-label="Choix du booster" hidden></div>
       <div id="packZone">
         <button class="pack" id="pack" aria-label="Ouvrir un booster">
           <i class="flap"></i><span class="pk-emoji">🃏</span><span class="pk-name">Booster</span><span class="pk-sub">5 cartes</span>
@@ -330,6 +389,7 @@ textarea{min-height:90px;resize:vertical}
       <input id="qs" type="search" placeholder="Rechercher un nom…" aria-label="Rechercher">
       <select id="fr" aria-label="Rareté"><option value="">Toutes raretés</option></select>
       <select id="ft" aria-label="Type"><option value="">Tous types</option></select>
+      <select id="fb" aria-label="Booster" hidden><option value="">Tous les boosters</option></select>
       <select id="so" aria-label="Tri"><option value="new">Plus récentes</option><option value="old">Plus anciennes</option><option value="nom">Nom A → Z</option><option value="rar+">Rareté croissante</option><option value="rar-">Rareté décroissante</option></select>
     </div>
     <div class="share backup" id="backupBox">
@@ -370,6 +430,54 @@ textarea{min-height:90px;resize:vertical}
     <div class="grid" id="grid"></div>
   </section>
 
+  <section id="boosters" hidden>
+    <div id="bList">
+      <div class="bhead">
+        <p class="mute">Range tes cartes dans des boosters personnalisés (nom, emoji, couleur), puis ouvre celui que tu veux. Une carte peut être dans plusieurs boosters.</p>
+        <button class="btn" id="bNew" type="button">＋ Nouveau booster</button>
+      </div>
+      <div class="share pubout" id="bPub" hidden>
+        <strong>🌍 Publier « <span id="bpName"></span> » sur NSI Hub</strong>
+        <ul class="checks" id="bpChecks"></ul>
+        <div id="bpMissing"></div>
+        <label>Pseudo affiché sous le booster
+          <input id="bpPseudo" maxlength="24" placeholder="Évite ton nom complet" autocomplete="nickname">
+        </label>
+        <div class="row2">
+          <a class="btn" id="bpGo" href="#" target="_blank" rel="noopener" aria-disabled="true">Envoyer le booster sur GitHub</a>
+          <button class="btn ghost" id="bpRefresh" type="button">Actualiser</button>
+          <button class="btn ghost" id="bpClose" type="button">Fermer</button>
+          <span class="mute" id="bpMsg" role="status"></span>
+        </div>
+      </div>
+      <div class="bgrid" id="bGrid"></div>
+    </div>
+    <form id="bForm" hidden>
+      <div class="bform-top">
+        <div class="pkw" id="bPrevW"></div>
+        <div class="bfields">
+          <label>Nom du booster
+            <input id="bNom" maxlength="32" placeholder="Club NSI" required>
+          </label>
+          <label>Emoji
+            <input id="bEmoji" maxlength="8" placeholder="🃏">
+          </label>
+          <div class="emojis" id="bEmojis"></div>
+          <div><span class="lbl">Couleur</span><div class="swatches" id="bSw"></div></div>
+        </div>
+      </div>
+      <div class="bpick-head">
+        <strong>Cartes du booster</strong><span class="mute" id="bCount"></span>
+        <select id="bFr" aria-label="Filtrer par rareté"><option value="">Toutes raretés</option></select>
+        <button class="btn ghost" id="bAll" type="button">Tout cocher</button>
+        <button class="btn ghost" id="bNone" type="button">Tout décocher</button>
+      </div>
+      <div class="bpick" id="bPick"></div>
+      <p class="mute" style="margin:0;font-size:.82rem">Pour publier un booster sur NSI Hub : au moins 10 cartes, dont une de chaque rareté, toutes déjà publiques.</p>
+      <div class="acts"><button class="btn" type="submit">Enregistrer le booster</button><button class="btn ghost" id="bCancel" type="button">Annuler</button></div>
+    </form>
+  </section>
+
   <section id="creer" hidden>
     <div class="make">
       <form id="form">
@@ -389,6 +497,9 @@ textarea{min-height:90px;resize:vertical}
         </label>
         <label>Type (cadre de la carte)
           <select id="type"></select>
+        </label>
+        <label id="addBWrap" hidden>Ajouter au booster
+          <select id="addB"><option value="">Aucun</option></select>
         </label>
         <label>Image
           <input id="img" type="file" accept="image/*">
@@ -492,21 +603,22 @@ const FXC={rare:"#2f7fe0",epique:"#9a45e0",legendaire:"#e0a21a",superlegendaire:
 let hand=[],pos=0,busy=false;
 
 function makeBooster(){
-  const o=[];for(let i=0;i<4;i++)o.push(pick());
-  const hi=cards.filter(c=>c.rar!=="commune");
-  o.push(hi.length?pick(hi):pick());
+  const P=poolCards();
+  const o=[];for(let i=0;i<4;i++)o.push(pick(P));
+  const hi=P.filter(c=>c.rar!=="commune");
+  o.push(hi.length?pick(hi):pick(P));
   return o.sort((a,b)=>ORDER.indexOf(a.rar)-ORDER.indexOf(b.rar));
 }
 pack.onclick=()=>{
   if(busy)return;
-  if(!cards.length){info.textContent="Crée d’abord des cartes pour ouvrir un booster.";return}
+  if(!poolCards().length){info.textContent=bsel==="all"?"Crée d’abord des cartes pour ouvrir un booster.":"Ce booster est vide : ajoute-lui des cartes dans l’onglet Boosters.";return}
   busy=true;info.textContent="";
   pack.classList.add("shake");
   setTimeout(()=>{pack.classList.remove("shake");pack.classList.add("opening");flash("#fff",.8);burst()},800);
   setTimeout(()=>{q("packZone").hidden=true;pack.classList.remove("opening");deal();busy=false},1500);
 };
 function deal(){
-  hand=makeBooster();pos=0;row.replaceChildren();again.hidden=true;
+  hand=makeBooster();pos=0;row.replaceChildren();again.hidden=true;q("bchoice").hidden=true;
   fan.replaceChildren();fan.hidden=false;
   hand.forEach((c,i)=>{
     const f=document.createElement("div");f.className="flip";
@@ -545,7 +657,7 @@ function step(){
 }
 fan.onclick=step;
 fan.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();step()}};
-again.onclick=()=>{row.replaceChildren();again.hidden=true;q("packZone").hidden=false;info.textContent="Clique sur le booster pour l’ouvrir."};
+again.onclick=()=>{row.replaceChildren();again.hidden=true;q("packZone").hidden=false;renderChoice();info.textContent="Clique sur le booster pour l’ouvrir."};
 
 function flash(col,a){
   const d=document.createElement("div");d.className="flash";
@@ -582,7 +694,8 @@ function renderGrid(){
   const s=q("qs").value.trim().toLowerCase(),fr=q("fr").value,ft=q("ft").value,so=q("so").value;
   let list=view==="owned"?cards.filter(c=>owned[c.id]):cards.slice();
   const total=list.length;
-  list=list.filter(c=>(!s||c.nom.toLowerCase().includes(s))&&(!fr||c.rar===fr)&&(!ft||(c.type||"neutre")===ft));
+  const fbB=getB(q("fb").value);
+  list=list.filter(c=>(!s||c.nom.toLowerCase().includes(s))&&(!fr||c.rar===fr)&&(!ft||(c.type||"neutre")===ft)&&(!fbB||fbB.cartes.includes(c.id)));
   list.sort((a,b)=>so==="old"?a.id-b.id:so==="nom"?a.nom.localeCompare(b.nom,"fr"):so==="rar+"?rk(a)-rk(b)||b.id-a.id:so==="rar-"?rk(b)-rk(a)||b.id-a.id:b.id-a.id);
   q("count").textContent=(view==="owned"?total+" / "+cards.length+" cartes obtenues":total+" cartes créées")+(list.length!==total?" ("+list.length+" affichées)":"");
   if(!list.length){const p=document.createElement("p");p.className="mute";p.textContent=view==="owned"&&!total?"Aucune carte obtenue pour l’instant : ouvre un booster !":"Aucune carte ne correspond.";g.append(p);return}
@@ -599,7 +712,7 @@ function renderGrid(){
     const bar=document.createElement("div");bar.style.cssText="display:flex;gap:6px;flex-wrap:wrap;justify-content:center";
     if(c.pub){const pb=document.createElement("span");pb.className="pub-badge";pb.textContent="🌍 Envoyée";pb.title="Envoyée sur NSI Hub";ce.append(pb)}
     bar.append(mk("Modifier",()=>editCard(c)),mk("Partager",()=>showCode(c)),mk("Publier",()=>{pubTarget(c)}),mk("Supprimer",b=>{
-      if(b.dataset.sure){cards=cards.filter(x=>x.id!==c.id);delete owned[c.id];save();saveOwned();renderGrid();return}
+      if(b.dataset.sure){cards=cards.filter(x=>x.id!==c.id);delete owned[c.id];boosters.forEach(x=>x.cartes=x.cartes.filter(id=>id!==c.id));save();saveOwned();saveB();refreshB();renderGrid();return}
       b.dataset.sure="1";b.textContent="Confirmer ?";
       setTimeout(()=>{delete b.dataset.sure;b.textContent="Supprimer"},3000);
     }));
@@ -652,6 +765,7 @@ function resetForm(){
   $("save").textContent="Enregistrer la carte";$("cancel").hidden=true;renderPreview();
   if(typeof syncAgree==="function")syncAgree();
   if(typeof syncVis==="function")syncVis();
+  if(typeof lastAddB!=="undefined"&&getB(lastAddB))$("addB").value=lastAddB;
 }
 function editCard(c){
   editingId=c.id;cim=null;$("cropBox").hidden=true;$("img").value="";
@@ -709,6 +823,8 @@ $("form").addEventListener("submit",e=>{
   const f={nom:$("nom").value.trim(),rar:$("rar").value,type:$("type").value,desc:$("desc").value.trim(),img:imgData};
   let nc=cards.find(c=>c.id===editingId);
   if(nc)Object.assign(nc,f);else{nc={id:Date.now(),...f,emoji:"🖼️"};cards.push(nc)}
+  const addTo=getB($("addB").value);lastAddB=$("addB").value;
+  if(addTo&&!addTo.cartes.includes(nc.id)){addTo.cartes.push(nc.id);saveB()}
   const pub=document.querySelector('input[name="vis"]:checked').value==="public";
   const pseudo=$("pseudo").value.trim();
   if(pub){try{localStorage.setItem(PKEY,pseudo)}catch(e){}}
@@ -794,7 +910,7 @@ function burst(){
   sparks(z,null,46);
 }
 document.addEventListener("pointermove",e=>{
-  const c=e.target.closest&&e.target.closest(".card");if(!c||c.closest(".mini"))return;
+  const c=e.target.closest&&e.target.closest(".card");if(!c||c.closest(".mini,.pk-item"))return;
   const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
   c.style.setProperty("--mx",x*100+"%");c.style.setProperty("--my",y*100+"%");
   c.style.setProperty("--rx",(.5-y)*14+"deg");c.style.setProperty("--ry",(x-.5)*14+"deg");
@@ -851,15 +967,17 @@ lb.addEventListener("touchend",e=>{if(tx0===null)return;const d=e.changedTouches
 
 // filtres, vues et listes déroulantes
 Object.entries(TYPES).forEach(([k,t])=>[q("type"),q("ft")].forEach(s=>s.add(new Option((t.i?t.i+" ":"")+t.l,k))));
-Object.entries(RAR).forEach(([k,r])=>q("fr").add(new Option(r.l,k)));
-["qs","fr","ft","so"].forEach(i=>q(i).addEventListener("input",renderGrid));
+Object.entries(RAR).forEach(([k,r])=>[q("fr"),q("bFr")].forEach(s=>s.add(new Option(r.l,k))));
+["qs","fr","ft","so","fb"].forEach(i=>q(i).addEventListener("input",renderGrid));
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{view=b.dataset.v;enter=true;renderGrid()});
 
 // onglets
 function show(name){
   document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name));
-  ["tirer","collection","creer"].forEach(s=>$(s).hidden=s!==name);
+  ["tirer","collection","boosters","creer"].forEach(s=>$(s).hidden=s!==name);
   if(name==="collection"){enter=true;renderGrid()}
+  if(name==="boosters")renderBoosters();
+  if(name==="tirer"&&fan.hidden)renderChoice();
   if(name==="creer")renderPreview();
 }
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.tab));
@@ -867,7 +985,7 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.
 // sauvegarde complète : export/restauration de toute la collection en fichier JSON
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 q("exp").onclick=()=>{
-  const d={app:"booster-perso",v:1,date:new Date().toISOString(),cards,owned};
+  const d={app:"booster-perso",v:2,date:new Date().toISOString(),cards,owned,boosters};
   const b=new Blob([JSON.stringify(d)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(b);a.download="booster-perso-"+new Date().toISOString().slice(0,10)+".json";
@@ -900,12 +1018,261 @@ q("bakFile").addEventListener("change",async e=>{
       const n=Math.floor(+v)||0;
       if(n>0&&cards.some(x=>x.id===nid))owned[nid]=Math.max(owned[nid]||0,n);
     }
-    save();saveOwned();renderGrid();
-    msg.textContent=added?added+" carte"+(added>1?"s":"")+" restaurée"+(added>1?"s":"")+" !":"Tout était déjà dans ta collection.";
+    let addedB=0;
+    if(Array.isArray(d.boosters))d.boosters.forEach(b=>{
+      if(!b||typeof b.nom!=="string"||!b.nom||!Array.isArray(b.cartes))return;
+      const ids=[...new Set(b.cartes.map(k=>map[k]!==undefined?map[k]:k).filter(id=>cards.some(c=>c.id===id)))];
+      const same=boosters.find(x=>x.nom===b.nom&&x.cartes.length===ids.length&&ids.every(id=>x.cartes.includes(id)));
+      if(same)return;
+      boosters.push({id:"b"+Date.now()+Math.floor(Math.random()*1e4),nom:b.nom.slice(0,32),emoji:String(b.emoji||"🃏").slice(0,8),couleur:/^#[0-9a-f]{6}$/i.test(b.couleur)?b.couleur:"#3b4cca",cartes:ids,...(b.src==="nsi"?{src:"nsi",nsi:b.nsi}:{})});
+      addedB++;
+    });
+    save();saveOwned();saveB();refreshB();renderGrid();
+    msg.textContent=(addedB?addedB+" booster"+(addedB>1?"s":"")+" restauré"+(addedB>1?"s":"")+". ":"")+(added?added+" carte"+(added>1?"s":"")+" restaurée"+(added>1?"s":"")+" !":(addedB?"":"Tout était déjà dans ta collection."));
   }catch(err){msg.textContent="Fichier de sauvegarde invalide."}
 });
 
-load();renderPreview();
+// ============ boosters personnalisés ============
+const BKEY="tcg-boosters-v1",SKEY="tcg-bsel-v1",NSI_BASE="https://rafaelmmix.github.io/nsi/";
+const BCOLORS=["#3b4cca","#9a45e0","#d94f9a","#e0502a","#e0a21a","#3aa24a","#2a8fe0","#28c7de","#e8304f","#1d2233"];
+const BEMOJIS=["🃏","🐍","💻","🎓","🔥","🌊","🌿","🌙","✨","⚡","🐉","👑","💎","🍀","🎮","🦊"];
+let boosters=[],bsel="all",bEdit=null,lastAddB="";
+function loadB(){
+  try{boosters=JSON.parse(localStorage.getItem(BKEY))||[]}catch(e){boosters=[]}
+  if(!Array.isArray(boosters))boosters=[];
+  boosters=boosters.filter(b=>b&&b.id&&typeof b.nom==="string").map(b=>({...b,cartes:Array.isArray(b.cartes)?b.cartes:[]}));
+  try{bsel=localStorage.getItem(SKEY)||"all"}catch(e){}
+  if(bsel!=="all"&&!getB(bsel))bsel="all";
+}
+function saveB(){try{localStorage.setItem(BKEY,JSON.stringify(boosters));localStorage.setItem(SKEY,bsel)}catch(e){alert("Stockage plein : supprime des cartes ou utilise des images plus petites.")}}
+function getB(id){return id?boosters.find(b=>String(b.id)===String(id)):undefined}
+function bCards(b){return b?b.cartes.map(id=>cards.find(c=>c.id===id)).filter(Boolean):cards}
+function poolCards(){return bsel==="all"?cards:bCards(getB(bsel))}
+const plural=(n,w)=>n+" "+w+(n>1?"s":"");
+
+// identifiant stable d'une carte (le même sur NSI Hub et dans la publication)
+async function cid(c){
+  const t=JSON.stringify([c.nom,c.rar,String(c.desc||""),c.img||"",c.type||"neutre"]);
+  const h=new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t)));
+  return [...h.slice(0,8)].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+
+function packLook(el,b,sub){
+  if(b){el.dataset.custom="";el.style.setProperty("--pc",b.couleur||"#3b4cca")}else{delete el.dataset.custom;el.style.removeProperty("--pc")}
+  el.querySelector(".pk-emoji").textContent=(b&&b.emoji)||"🃏";
+  el.querySelector(".pk-name").textContent=b?b.nom:"Booster";
+  el.querySelector(".pk-sub").textContent=sub||"5 cartes";
+}
+function miniPack(b,n){
+  const p=document.createElement("div");p.className="pack";p.setAttribute("aria-hidden","true");
+  p.innerHTML='<i class="flap"></i><span class="pk-emoji"></span><span class="pk-name"></span><span class="pk-sub"></span>';
+  packLook(p,b,plural(n,"carte"));return p;
+}
+
+// choix du booster dans l'onglet Tirer
+function renderChoice(){
+  const z=q("bchoice");z.replaceChildren();z.hidden=!boosters.length;
+  const mk=(id,label,n,col)=>{
+    const b=document.createElement("button");b.type="button";b.setAttribute("role","radio");
+    b.setAttribute("aria-checked",String(bsel===String(id)));if(col)b.style.setProperty("--bc",col);
+    b.append(label+" ");const sm=document.createElement("small");sm.textContent=n;b.append(sm);
+    b.onclick=()=>{if(busy||!fan.hidden)return;bsel=String(id);saveB();renderChoice()};
+    return b;
+  };
+  z.append(mk("all","🃏 Toutes mes cartes",cards.length));
+  boosters.forEach(b=>z.append(mk(b.id,(b.emoji||"🃏")+" "+b.nom,bCards(b).length,b.couleur)));
+  packLook(pack,bsel==="all"?null:getB(bsel));
+  const cur=z.querySelector('[aria-checked="true"]');if(cur&&cur.scrollIntoView&&!z.hidden)cur.scrollIntoView({block:"nearest",inline:"center"});
+}
+
+function refreshSelects(){
+  [["fb","Tous les boosters"],["addB","Aucun"]].forEach(([id,first])=>{
+    const sl=q(id),v=sl.value;sl.replaceChildren(new Option(first,""));
+    boosters.forEach(b=>sl.add(new Option((b.emoji?b.emoji+" ":"")+b.nom,b.id)));
+    sl.value=getB(v)?v:"";
+  });
+  q("fb").hidden=!boosters.length;q("addBWrap").hidden=!boosters.length;
+}
+function refreshB(){renderBoosters();renderChoice();refreshSelects()}
+
+// liste des boosters
+function renderBoosters(){
+  const g=q("bGrid");g.replaceChildren();
+  if(!boosters.length){const p=document.createElement("p");p.className="mute";p.textContent="Aucun booster pour l’instant : crée le premier !";g.append(p);return}
+  boosters.forEach(b=>{
+    const list=bCards(b),t=document.createElement("div");t.className="btile";
+    const w=document.createElement("div");w.className="pkw";w.append(miniPack(b,list.length));
+    const inf=document.createElement("div");inf.className="binfo";
+    const h=document.createElement("h3");h.textContent=b.nom;
+    const m=document.createElement("p");m.className="mute";
+    m.textContent=plural(list.length,"carte")+(b.src==="nsi"?" · de NSI Hub"+(b.createur?" (par "+b.createur+")":""):"")+(b.pub?" · 🌍 envoyé":"");
+    const dots=document.createElement("div");dots.className="dots";const have=new Set(list.map(c=>c.rar));
+    ORDER.forEach(r=>{const d=document.createElement("span");d.className="dot"+(have.has(r)?" on":"");d.dataset.r=r;d.title=RAR[r].l+(have.has(r)?"":" : aucune");dots.append(d)});
+    const acts=document.createElement("div");acts.className="acts";
+    const mk=(txt,f,ghost=true)=>{const x=document.createElement("button");x.type="button";x.className="btn"+(ghost?" ghost":"");x.textContent=txt;x.onclick=()=>f(x);return x};
+    acts.append(mk("Ouvrir",()=>{bsel=String(b.id);saveB();show("tirer")},false),mk("Modifier",()=>editB(b)));
+    if(b.src!=="nsi")acts.append(mk("Publier",()=>openBPub(b)));
+    acts.append(mk("Supprimer",x=>{
+      if(x.dataset.sure){boosters=boosters.filter(y=>y!==b);if(bsel===String(b.id))bsel="all";if(bpTarget===b)q("bPub").hidden=true;saveB();refreshB();return}
+      x.dataset.sure="1";x.textContent="Confirmer ?";setTimeout(()=>{delete x.dataset.sure;x.textContent="Supprimer"},3000);
+    }));
+    inf.append(h,m,dots,acts);t.append(w,inf);g.append(t);
+  });
+}
+
+// éditeur de booster
+function editB(b){
+  bEdit={id:b?b.id:null,sel:new Set(b?b.cartes.filter(id=>cards.some(c=>c.id===id)):[]),couleur:b?b.couleur||BCOLORS[0]:BCOLORS[boosters.length%BCOLORS.length]};
+  q("bNom").value=b?b.nom:"";q("bEmoji").value=b?b.emoji||"🃏":"🃏";q("bFr").value="";
+  q("bList").hidden=true;q("bForm").hidden=false;
+  renderSw();renderPick();bPreview();
+  q("bForm").scrollIntoView({block:"start",behavior:RM.matches?"auto":"smooth"});
+}
+function closeB(){q("bForm").hidden=true;q("bList").hidden=false;bEdit=null;refreshB()}
+function bPreview(){
+  if(!bEdit)return;
+  const fake={nom:q("bNom").value.trim()||"Mon booster",emoji:q("bEmoji").value.trim()||"🃏",couleur:bEdit.couleur};
+  q("bPrevW").replaceChildren(miniPack(fake,bEdit.sel.size));
+  const have=new Set([...bEdit.sel].map(id=>(cards.find(c=>c.id===id)||{}).rar));
+  q("bCount").textContent=plural(bEdit.sel.size,"carte")+" · "+ORDER.filter(r=>have.has(r)).length+"/7 raretés";
+}
+function renderSw(){
+  const z=q("bSw");z.replaceChildren();
+  BCOLORS.forEach(col=>{
+    const b=document.createElement("button");b.type="button";b.style.setProperty("--sw",col);
+    b.setAttribute("aria-label","Couleur "+col);b.setAttribute("aria-pressed",String(bEdit.couleur===col));
+    b.onclick=()=>{bEdit.couleur=col;renderSw();bPreview()};z.append(b);
+  });
+  const ci=document.createElement("input");ci.type="color";ci.value=bEdit.couleur;ci.setAttribute("aria-label","Couleur personnalisée");ci.title="Couleur personnalisée";
+  ci.oninput=()=>{bEdit.couleur=ci.value;z.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));bPreview()};
+  z.append(ci);
+}
+function pickVisible(){const fr=q("bFr").value;return cards.filter(c=>!fr||c.rar===fr)}
+function renderPick(){
+  const z=q("bPick");z.replaceChildren();
+  if(!cards.length){const p=document.createElement("p");p.className="mute";p.textContent="Crée d’abord des cartes pour les ranger dans un booster.";z.append(p);return}
+  const list=pickVisible().sort((a,b)=>rk(a)-rk(b)||a.nom.localeCompare(b.nom,"fr"));
+  if(!list.length){const p=document.createElement("p");p.className="mute";p.textContent="Aucune carte de cette rareté.";z.append(p);return}
+  list.forEach(c=>{
+    const b=document.createElement("button");b.type="button";b.className="pk-item";
+    b.setAttribute("aria-pressed",String(bEdit.sel.has(c.id)));b.setAttribute("aria-label",c.nom+" ("+RAR[c.rar].l+")");b.title=c.nom;
+    b.append(cardEl(c));
+    b.onclick=()=>{bEdit.sel.has(c.id)?bEdit.sel.delete(c.id):bEdit.sel.add(c.id);b.setAttribute("aria-pressed",String(bEdit.sel.has(c.id)));bPreview()};
+    z.append(b);
+  });
+}
+q("bNew").onclick=()=>editB(null);
+q("bCancel").onclick=closeB;
+q("bFr").addEventListener("input",renderPick);
+q("bAll").onclick=()=>{pickVisible().forEach(c=>bEdit.sel.add(c.id));renderPick();bPreview()};
+q("bNone").onclick=()=>{pickVisible().forEach(c=>bEdit.sel.delete(c.id));renderPick();bPreview()};
+["bNom","bEmoji"].forEach(i=>q(i).addEventListener("input",bPreview));
+BEMOJIS.forEach(em=>{const b=document.createElement("button");b.type="button";b.textContent=em;b.setAttribute("aria-label","Emoji "+em);b.onclick=()=>{q("bEmoji").value=em;bPreview()};q("bEmojis").append(b)});
+q("bForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const nom=q("bNom").value.trim();if(!nom){q("bNom").focus();return}
+  const data={nom:nom.slice(0,32),emoji:Array.from(q("bEmoji").value.trim()).slice(0,6).join("")||"🃏",couleur:bEdit.couleur,cartes:[...bEdit.sel]};
+  let b=getB(bEdit.id);
+  if(b)Object.assign(b,data);else{b={id:"b"+Date.now(),...data};boosters.push(b)}
+  if(b.pub&&b.src!=="nsi")delete b.pub;
+  saveB();closeB();
+});
+
+// publication d'un booster sur NSI Hub
+let pubIdx=null,bpTarget=null,bpCode="";
+async function publicIndex(force){
+  if(pubIdx&&!force)return pubIdx;
+  const get=async(u,how)=>{try{const r=await fetch(NSI_BASE+u+"?v="+Date.now());return r.ok?await r[how]():null}catch(e){return null}};
+  const [js,json]=await Promise.all([get("cartes.js","text"),get("cartes-publiques.json","json")]);
+  if(js===null&&json===null)throw new Error("NSI Hub injoignable");
+  const codes=[...((js||"").match(/TCG[01]-[A-Za-z0-9_-]+/g)||[]),...(Array.isArray(json)?json.map(x=>x&&x.code).filter(Boolean):[])];
+  const idx=new Map();
+  for(const code of new Set(codes)){try{const c=await decode(code);idx.set(await cid(c),c)}catch(e){}}
+  return pubIdx=idx;
+}
+async function encodeBooster(b,ids){
+  const raw=new TextEncoder().encode(JSON.stringify({v:1,n:b.nom,e:b.emoji||"🃏",c:b.couleur||"#3b4cca",k:[...new Set(ids)]}));
+  if(typeof CompressionStream==="undefined")return "BST0-"+b64(raw);
+  return "BST1-"+b64(await pipe(raw,CompressionStream));
+}
+async function openBPub(b,force){
+  bpTarget=b;bpCode="";
+  q("bPub").hidden=false;q("bpName").textContent=b.nom;q("bpMsg").textContent="Vérification sur NSI Hub…";
+  q("bpChecks").replaceChildren();q("bpMissing").replaceChildren();q("bpGo").setAttribute("aria-disabled","true");
+  if(!q("bpPseudo").value)q("bpPseudo").value=getPseudo();
+  q("bPub").scrollIntoView({block:"nearest",behavior:RM.matches?"auto":"smooth"});
+  const list=bCards(b),have=new Set(list.map(c=>c.rar)),missR=ORDER.filter(r=>!have.has(r));
+  let idx=null;try{idx=await publicIndex(force)}catch(e){}
+  const ids=await Promise.all(list.map(cid));
+  if(bpTarget!==b)return;
+  const notPub=idx?list.filter((c,i)=>!idx.has(ids[i])):list;
+  const ul=q("bpChecks");
+  const li=(ok,t)=>{const x=document.createElement("li");if(ok)x.className="ok";x.textContent=t;ul.append(x);return ok};
+  const ok1=li(list.length>=10,"Au moins 10 cartes ("+list.length+")");
+  const ok2=li(!missR.length,"Au moins une carte de chaque rareté"+(missR.length?" (manque : "+missR.map(r=>RAR[r].l).join(", ")+")":""));
+  const ok3=li(!!idx&&!notPub.length,idx?"Toutes les cartes sont publiques sur NSI Hub ("+(list.length-notPub.length)+"/"+list.length+")":"NSI Hub est injoignable : vérifie ta connexion, puis Actualiser");
+  const m=q("bpMissing");
+  if(idx&&notPub.length){
+    const t=document.createElement("p");t.className="mute";t.textContent="Publie d’abord ces cartes. Quand Rafael les aura validées, clique sur Actualiser.";m.append(t);
+    notPub.forEach(c=>{
+      const r=document.createElement("div");r.className="miss-row";
+      const sp=document.createElement("span");sp.textContent=c.nom+" · "+RAR[c.rar].l+(c.pub?" · en attente de validation":"");
+      const bt=document.createElement("button");bt.type="button";bt.className="btn ghost";bt.textContent=c.pub?"Renvoyer":"Publier";
+      bt.onclick=()=>{view="made";show("collection");pubTarget(c)};
+      r.append(sp,bt);m.append(r);
+    });
+  }
+  const ready=ok1&&ok2&&ok3;
+  if(ready)bpCode=await encodeBooster(b,ids);
+  q("bpGo").setAttribute("aria-disabled",String(!ready));
+  q("bpMsg").textContent=ready?"Tout est prêt !":"";
+}
+q("bpRefresh").onclick=()=>{if(bpTarget)openBPub(bpTarget,true)};
+q("bpClose").onclick=()=>{q("bPub").hidden=true;bpTarget=null};
+q("bpGo").addEventListener("click",e=>{
+  if(q("bpGo").getAttribute("aria-disabled")==="true"||!bpCode||!bpTarget){e.preventDefault();q("bpMsg").textContent="Le booster ne remplit pas encore toutes les conditions.";return}
+  const pseudo=q("bpPseudo").value.trim();
+  if(!pseudo){e.preventDefault();q("bpMsg").textContent="Choisis d’abord un pseudo.";q("bpPseudo").focus();return}
+  try{localStorage.setItem(PKEY,pseudo)}catch(err){}
+  q("bpGo").href=NSI_ISSUE+"?template=booster-public.yml&title="+encodeURIComponent("Booster : "+bpTarget.nom)+"&pseudo="+encodeURIComponent(pseudo)+"&code="+bpCode;
+  bpTarget.pub=1;saveB();renderBoosters();
+  q("bpMsg").textContent="Demande ouverte dans un nouvel onglet : valide-la sur GitHub.";
+});
+
+// ouverture d'un booster publié sur NSI Hub (lien …#booster=<numéro>)
+async function importFromHash(){
+  const m=location.hash.match(/^#booster=(\d+)$/);if(!m)return;
+  history.replaceState(null,"",location.pathname+location.search);
+  show("tirer");info.textContent="Import du booster depuis NSI Hub…";
+  try{
+    const r=await fetch(NSI_BASE+"boosters-publics.json?v="+Date.now());
+    const list=r.ok?await r.json():[];
+    const nb=Array.isArray(list)&&list.find(x=>x&&String(x.issue)===m[1]);
+    if(!nb||!Array.isArray(nb.cartes))throw new Error("introuvable");
+    const idx=await publicIndex(true);
+    const local=new Map();for(const c of cards)local.set(await cid(c),c);
+    let added=0,next=Date.now();const ids=[];
+    for(const k of nb.cartes){
+      let c=local.get(k);
+      if(!c){
+        const p=idx.get(k);if(!p)continue;
+        while(cards.some(x=>x.id===next))next++;
+        c={id:next++,nom:p.nom,rar:p.rar,desc:p.desc,img:p.img,type:p.type||"neutre",emoji:"🖼️"};
+        cards.push(c);local.set(k,c);added++;
+      }
+      ids.push(c.id);
+    }
+    if(!ids.length)throw new Error("vide");
+    const data={nom:String(nb.nom).slice(0,32),emoji:String(nb.emoji||"🃏").slice(0,8),couleur:/^#[0-9a-f]{6}$/i.test(nb.couleur)?nb.couleur:"#3b4cca",cartes:[...new Set(ids)],src:"nsi",nsi:+m[1],createur:String(nb.createur||"").slice(0,24)};
+    let b=boosters.find(x=>x.src==="nsi"&&String(x.nsi)===m[1]);
+    if(b)Object.assign(b,data);else{b={id:"b"+Date.now(),...data};boosters.push(b)}
+    bsel=String(b.id);save();saveB();refreshB();
+    info.textContent="Booster « "+b.nom+" » ajouté"+(added?" avec "+added+(added>1?" nouvelles cartes":" nouvelle carte"):"")+" ! Clique dessus pour l’ouvrir.";
+  }catch(e){info.textContent="Impossible d’importer ce booster depuis NSI Hub."}
+}
+
+load();loadB();refreshSelects();renderChoice();renderPreview();importFromHash();
+addEventListener("hashchange",importFromHash);
 </script>
 </body>
 </html>

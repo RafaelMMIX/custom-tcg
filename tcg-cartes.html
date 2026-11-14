@@ -248,6 +248,44 @@ section:not([hidden]){animation:fadein .4s ease-out}
 @media (prefers-reduced-motion:reduce){.lbw .card,.lb-halo,#lb{animation:none!important}}
 @media (prefers-reduced-motion:reduce){body::before,#packZone::before,.pack::after,h1,section,.grid .item,.card,#preview .card,.flip.charge,.flip .front .card{animation:none!important}.ring,.rays,.drop,.star,.wisp,.veil{display:none}}
 
+/* visibilité privée / publique */
+.vis{border:0;padding:0;margin:0;display:grid;gap:6px}
+.vis legend{font-weight:700;font-size:.9rem;padding:0;margin-bottom:5px}
+.vis-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vis-opts label{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;
+  background:color-mix(in srgb,var(--bg) 70%,var(--panel));transition:border-color .2s,background .2s,box-shadow .2s}
+.vis-opts input{position:absolute;opacity:0;pointer-events:none}
+.vis-opts small{font-weight:400;color:var(--mute);font-size:.78rem}
+.vis-opts label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.vis-opts label:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+#pubBox:not([hidden]){display:grid;gap:8px}
+#pubBox p{margin:0;font-size:.82rem}
+.pubout{border-left:4px solid #28c7de;display:grid;gap:10px}
+.pubout[hidden]{display:none}
+.pubout strong{font-family:var(--serif)}
+.pubout p{margin:0}
+a.btn{text-decoration:none;display:inline-block;text-align:center}
+.pub-badge{position:absolute;left:14px;top:44px;background:#0f6e7c;color:#fff;font:800 .7rem var(--sans);padding:2px 8px;border-radius:99px;z-index:4}
+.galink{font-weight:700;color:var(--accent);text-decoration:none;align-self:center;white-space:nowrap}
+.galink:hover{text-decoration:underline}
+
+/* case d'acceptation */
+.agree{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:.85rem;line-height:1.4;cursor:pointer;
+  padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,#e0a21a 8%,transparent);transition:border-color .2s,background .2s}
+.agree input{width:20px;height:20px;flex:none;margin:1px 0 0;padding:0;accent-color:var(--accent);cursor:pointer}
+.agree:has(input:checked){border-color:color-mix(in srgb,var(--accent) 60%,var(--line));background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.agree.need{border-color:#e8304f;animation:quake .4s}
+@media (prefers-reduced-motion:reduce){.agree.need{animation:none}}
+.btn.locked{opacity:.55}
+
+/* pied de page */
+.foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);text-align:center;color:var(--mute);font-size:.88rem}
+.foot>p{margin:0 0 8px}
+.foot strong{color:var(--ink)}
+.foot details{max-width:640px;margin:0 auto;text-align:left;background:color-mix(in srgb,var(--panel) 85%,transparent);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.foot summary{cursor:pointer;font-weight:700;color:var(--ink);text-align:center;list-style-position:inside}
+.foot-body p{margin:10px 0 0;line-height:1.5}
+
 /* créer */
 .make{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:start}
 @media (max-width:700px){.make{grid-template-columns:1fr}.make .card{margin:0 auto}}
@@ -288,6 +326,7 @@ textarea{min-height:90px;resize:vertical}
       <button type="button" data-v="made" aria-pressed="false">Créées</button>
     </div>
     <div class="tools">
+      <a class="galink" href="https://rafaelmmix.github.io/nsi/cartes.html" target="_blank" rel="noopener">🌍 Cartes publiques ↗</a>
       <input id="qs" type="search" placeholder="Rechercher un nom…" aria-label="Rechercher">
       <select id="fr" aria-label="Rareté"><option value="">Toutes raretés</option></select>
       <select id="ft" aria-label="Type"><option value="">Tous types</option></select>
@@ -301,6 +340,18 @@ textarea{min-height:90px;resize:vertical}
         <button class="btn ghost" id="impBak" type="button">Restaurer une sauvegarde</button>
         <input id="bakFile" type="file" accept=".json,application/json" hidden>
         <span class="mute" id="bakMsg" role="status"></span>
+      </div>
+    </div>
+    <div class="share pubout" id="pubOut" hidden>
+      <strong>🌍 Dernière étape : envoyer « <span id="pubName"></span> » sur NSI Hub</strong>
+      <p class="mute">Le bouton ouvre une demande sur GitHub, déjà remplie. Vérifie-la puis clique sur <b>Create</b> (ou <b>Submit new issue</b>). Si le champ « Code de la carte » est vide, colle le code : il est copié automatiquement.</p>
+      <label>Pseudo affiché sous la carte
+        <input id="pubPseudo" maxlength="24" placeholder="Évite ton nom complet" autocomplete="nickname">
+      </label>
+      <div class="row2">
+        <a class="btn" id="pubGo" href="#" target="_blank" rel="noopener">Envoyer sur GitHub</a>
+        <button class="btn ghost" id="pubClose" type="button">Plus tard</button>
+        <span class="mute" id="pubMsg" role="status"></span>
       </div>
     </div>
     <div class="share" id="shareBox">
@@ -350,11 +401,42 @@ textarea{min-height:90px;resize:vertical}
         <label>Description
           <textarea id="desc" maxlength="160" placeholder="Une courte description ou un effet…"></textarea>
         </label>
+        <fieldset class="vis">
+          <legend>Visibilité</legend>
+          <div class="vis-opts">
+            <label><input type="radio" name="vis" value="prive" checked>🔒 Privée<small>Reste sur cet appareil</small></label>
+            <label><input type="radio" name="vis" value="public">🌍 Publique<small>Proposée sur NSI Hub</small></label>
+          </div>
+        </fieldset>
+        <div id="pubBox" hidden>
+          <label>Ton pseudo (affiché sous la carte)
+            <input id="pseudo" maxlength="24" placeholder="Évite ton nom complet" autocomplete="nickname">
+          </label>
+          <p class="mute">Ta carte reste aussi dans ta collection. Elle est vérifiée par Rafael avant d’apparaître dans les cartes communautaires de NSI Hub. Il faut un compte GitHub (gratuit) pour l’envoyer.</p>
+        </div>
+        <label class="agree">
+          <input id="agree" type="checkbox" required>
+          <span>En créant une carte, tu es seul·e responsable de son contenu (texte et image). N’utilise que des images dont tu as le droit de te servir, et rien d’offensant ou d’illégal.</span>
+        </label>
         <div class="acts"><button class="btn" id="save" type="submit">Enregistrer la carte</button><button class="btn ghost" id="cancel" type="button" hidden>Annuler</button></div>
       </form>
       <div id="preview"></div>
     </div>
   </section>
+
+  <footer class="foot">
+    <p>Site créé par <strong>Rafael</strong> · Booster perso</p>
+    <details>
+      <summary>Avertissement &amp; responsabilité</summary>
+      <div class="foot-body">
+        <p>Booster perso est un outil gratuit qui permet à chacun de créer ses propres cartes. Rafael a créé le site, mais <strong>n’est pas l’auteur des cartes</strong> créées, importées ou partagées par les utilisateurs.</p>
+        <p>Chaque utilisateur est <strong>seul responsable</strong> des cartes qu’il crée ou partage (noms, descriptions, images) et de tout ce qui s’y rattache, notamment le respect des droits d’auteur, du droit à l’image et de la loi. Rafael décline toute responsabilité quant à ce contenu et à l’usage qui en est fait.</p>
+        <p>Les cartes privées sont enregistrées uniquement dans ton navigateur : elles ne sont envoyées nulle part. Pense à exporter ta collection régulièrement.</p>
+        <p>Une carte rendue <strong>publique</strong> est envoyée sur GitHub par son créateur lui-même, avec son pseudo, puis vérifiée avant d’apparaître sur NSI Hub. Rafael peut refuser ou retirer une carte à tout moment, sans avoir à se justifier. Le créateur reste seul responsable de son contenu.</p>
+        <p>Les codes de partage contiennent la carte entière : n’importe que des codes venant de personnes en qui tu as confiance.</p>
+      </div>
+    </details>
+  </footer>
 </main>
 <div id="lb" hidden role="dialog" aria-modal="true" aria-label="Carte en grand">
   <button class="lbx" id="lbx" type="button" aria-label="Fermer">✕</button>
@@ -495,7 +577,7 @@ function effect(f,r){
 const rk=c=>ORDER.indexOf(c.rar);
 function renderGrid(){
   const g=q("grid");g.replaceChildren();g.classList.toggle("enter",enter);enter=false;
-  q("shareBox").hidden=view!=="made";
+  q("shareBox").hidden=view!=="made";if(view!=="made")q("pubOut").hidden=true;
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===view));
   const s=q("qs").value.trim().toLowerCase(),fr=q("fr").value,ft=q("ft").value,so=q("so").value;
   let list=view==="owned"?cards.filter(c=>owned[c.id]):cards.slice();
@@ -515,7 +597,8 @@ function renderGrid(){
     }
     const mk=(t,f)=>{const b=document.createElement("button");b.className="btn ghost";b.textContent=t;b.onclick=()=>f(b);return b};
     const bar=document.createElement("div");bar.style.cssText="display:flex;gap:6px;flex-wrap:wrap;justify-content:center";
-    bar.append(mk("Modifier",()=>editCard(c)),mk("Partager",()=>showCode(c)),mk("Supprimer",b=>{
+    if(c.pub){const pb=document.createElement("span");pb.className="pub-badge";pb.textContent="🌍 Envoyée";pb.title="Envoyée sur NSI Hub";ce.append(pb)}
+    bar.append(mk("Modifier",()=>editCard(c)),mk("Partager",()=>showCode(c)),mk("Publier",()=>{pubTarget(c)}),mk("Supprimer",b=>{
       if(b.dataset.sure){cards=cards.filter(x=>x.id!==c.id);delete owned[c.id];save();saveOwned();renderGrid();return}
       b.dataset.sure="1";b.textContent="Confirmer ?";
       setTimeout(()=>{delete b.dataset.sure;b.textContent="Supprimer"},3000);
@@ -567,20 +650,70 @@ cv.addEventListener("pointermove",e=>{
 function resetForm(){
   $("form").reset();imgData="";editingId=null;cim=null;$("cropBox").hidden=true;
   $("save").textContent="Enregistrer la carte";$("cancel").hidden=true;renderPreview();
+  if(typeof syncAgree==="function")syncAgree();
+  if(typeof syncVis==="function")syncVis();
 }
 function editCard(c){
   editingId=c.id;cim=null;$("cropBox").hidden=true;$("img").value="";
+  setVis("prive");
   $("nom").value=c.nom;$("rar").value=c.rar;$("type").value=c.type||"neutre";$("desc").value=c.desc;imgData=c.img;
   $("save").textContent="Enregistrer les modifications";$("cancel").hidden=false;
+  agree.checked=false;syncAgree();syncVis();
   show("creer");
 }
 $("cancel").onclick=()=>{resetForm();view="made";show("collection")};
+// visibilité : privée (cet appareil) ou publique (envoyée sur NSI Hub via GitHub)
+const PKEY="tcg-pseudo-v1",NSI_ISSUE="https://github.com/RafaelMMIX/nsi/issues/new";
+const getPseudo=()=>{try{return localStorage.getItem(PKEY)||""}catch(e){return ""}};
+function syncVis(){
+  const pub=document.querySelector('input[name="vis"]:checked').value==="public";
+  $("pubBox").hidden=!pub;$("pseudo").required=pub;
+  if(pub&&!$("pseudo").value)$("pseudo").value=getPseudo();
+  $("save").textContent=editingId?"Enregistrer les modifications":pub?"Enregistrer et publier":"Enregistrer la carte";
+}
+function setVis(v){document.querySelector('input[name="vis"][value="'+v+'"]').checked=true;syncVis()}
+document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("change",syncVis));
+let pubCard=null,pubCode="";
+async function pubTarget(c,pseudo){
+  pubCard=c;pubCode=await encode(c);
+  q("pubOut").hidden=false;q("pubName").textContent=c.nom;q("pubMsg").textContent="";
+  q("pubPseudo").value=pseudo||getPseudo();
+  q("pubOut").scrollIntoView({behavior:RM.matches?"auto":"smooth",block:"center"});
+  if(!q("pubPseudo").value)q("pubPseudo").focus({preventScroll:true});
+}
+q("pubGo").addEventListener("click",e=>{
+  const pseudo=q("pubPseudo").value.trim();
+  if(!pubCard||!pubCode){e.preventDefault();return}
+  if(!pseudo){e.preventDefault();q("pubMsg").textContent="Choisis d’abord un pseudo.";q("pubPseudo").focus();return}
+  try{localStorage.setItem(PKEY,pseudo)}catch(err){}
+  let url=NSI_ISSUE+"?template=carte-publique.yml&title="+encodeURIComponent("Carte : "+pubCard.nom)+"&pseudo="+encodeURIComponent(pseudo);
+  const long=url.length+pubCode.length>7000;
+  if(!long)url+="&code="+pubCode;
+  q("pubGo").href=url;
+  if(navigator.clipboard)navigator.clipboard.writeText(pubCode).catch(()=>{});
+  pubCard.pub=1;save();renderGrid();q("pubOut").hidden=false;
+  q("pubMsg").textContent=long?"Code copié : colle-le dans « Code de la carte » sur GitHub.":"Demande ouverte dans un nouvel onglet.";
+});
+q("pubClose").onclick=()=>{q("pubOut").hidden=true;pubCard=null;pubCode=""};
+
+// case de responsabilité obligatoire avant d'enregistrer
+const agree=$("agree"),agreeBox=agree.closest(".agree");
+const syncAgree=()=>{$("save").classList.toggle("locked",!agree.checked);if(agree.checked)agreeBox.classList.remove("need")};
+agree.addEventListener("change",syncAgree);
+agree.addEventListener("invalid",()=>{agreeBox.classList.remove("need");void agreeBox.offsetWidth;agreeBox.classList.add("need")});
+syncAgree();
 $("form").addEventListener("submit",e=>{
   e.preventDefault();
+  if(!agree.checked){agreeBox.classList.add("need");agree.focus();return}
+  if(document.querySelector('input[name="vis"]:checked').value==="public"&&!$("pseudo").value.trim()){$("pseudo").focus();return}
   const f={nom:$("nom").value.trim(),rar:$("rar").value,type:$("type").value,desc:$("desc").value.trim(),img:imgData};
   let nc=cards.find(c=>c.id===editingId);
   if(nc)Object.assign(nc,f);else{nc={id:Date.now(),...f,emoji:"🖼️"};cards.push(nc)}
-  save();resetForm();view="made";show("collection");showCode(nc);
+  const pub=document.querySelector('input[name="vis"]:checked').value==="public";
+  const pseudo=$("pseudo").value.trim();
+  if(pub){try{localStorage.setItem(PKEY,pseudo)}catch(e){}}
+  save();resetForm();view="made";show("collection");
+  if(pub)pubTarget(nc,pseudo);else showCode(nc);
 });
 
 // codes de partage (la carte entière est encodée dans le code)

@@ -121,7 +121,7 @@ Deux raccourcis :
 
 ### Faire un match à deux
 
-Dans l'onglet **Match**, chaque joueur choisit **3 cartes différentes** parmi ses cartes obtenues (il en faut au moins 3). Un joueur peut prendre une carte que l'autre a aussi. Il n'y a pas encore de combat : le match s'arrête au dévoilement des équipes, que l'on peut agrandir en cliquant dessus.
+Dans l'onglet **Match**, chaque joueur choisit **3 cartes différentes** parmi ses cartes obtenues (il en faut au moins 3). Un joueur peut prendre une carte que l'autre a aussi. Il n'y a pas encore de combat : le match s'arrête au dévoilement des équipes, placées sur un **terrain de football** (une équipe de chaque côté, l'une en haut et l'autre en bas sur mobile). Cliquez sur une carte pour l'agrandir.
 
 **Sur le même appareil** : cliquez sur **Jouer sur cet appareil**. Le joueur 1 choisit, un écran de passage cache son choix, puis le joueur 2 choisit à son tour.
 

@@ -191,6 +191,16 @@ Une carte publique est proposée à la galerie [Cartes communautaires](https://r
 
 Évitez d'utiliser votre nom complet comme pseudo : il est affiché publiquement sous la carte.
 
+#### Mettre à jour une carte déjà publiée
+
+Chaque carte de la galerie a un **ID** (16 caractères, affiché sous la carte et utilisable dans la recherche). Pour modifier une carte déjà publiée (nom, description, image, attaques…) **sans en créer une deuxième** :
+
+1. Modifiez-la dans **Mes cartes → Créées → Modifier**, puis cliquez sur **Publier**.
+2. Dans le champ **ID de la carte à mettre à jour**, collez l'ID de la carte (il est pré-rempli si la carte a été publiée depuis cet appareil). Le bouton devient **Mettre à jour sur GitHub**.
+3. Validez la demande : une fois approuvée, la carte est remplacée **en place** sur NSI Hub, boosters compris, et garde le même ID.
+
+Laissé vide, le champ crée une nouvelle carte. L'ID d'une carte ne change jamais, même si son contenu change.
+
 ### Publier un booster sur NSI Hub
 
 Un booster publié apparaît dans la section **Boosters de la communauté** de NSI Hub, où chacun peut voir ses cartes et l'**ouvrir** dans Booster perso. Conditions :
@@ -356,7 +366,7 @@ Les polices Cinzel et Nunito sont chargées depuis Google Fonts. Hors ligne, l'a
 - Une carte modifiée après sa publication change d'identifiant : elle ne compte plus comme publique tant que la nouvelle version n'est pas publiée.
 - Publier un booster demande d'abord de publier chacune de ses cartes (une demande par carte).
 - Le mode **Match** s'arrête au dévoilement des équipes : il n'y a pas encore de règles de combat (les cartes n'ont pas de points de vie, seulement des attaques).
-- Une carte déjà publiée sur NSI Hub reçoit ses attaques en cliquant sur **Publier** après les avoir ajoutées dans **Modifier** : seul le contenu inchangé de la carte compte (nom, rareté, description, image, type), son identifiant NSI Hub reste le même. Si la carte est modifiée autrement, elle devient une nouvelle carte.
+- Une carte déjà publiée sur NSI Hub se met à jour en renseignant son **ID** au moment de publier (voir *Mettre à jour une carte déjà publiée*). Sans ID, une carte modifiée est publiée comme une nouvelle carte ; seule exception : si son contenu est identique à une carte existante et qu'elle a des attaques, ces attaques sont ajoutées à la carte existante.
 - Le match sur deux appareils dépend du service PeerJS pour le code à 4 chiffres (internet requis), et la connexion est perdue si l'un des joueurs recharge la page. La connexion manuelle fonctionne sans service externe, mais seulement si les deux appareils peuvent se joindre directement (même Wi‑Fi, sans isolation des appareils).
 
 ---

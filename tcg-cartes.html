@@ -503,6 +503,10 @@ textarea{min-height:90px;resize:vertical}
       <label>Pseudo affiché sous la carte
         <input id="pubPseudo" maxlength="24" placeholder="Évite ton nom complet" autocomplete="nickname">
       </label>
+      <label>ID de la carte à mettre à jour <span class="mute">(facultatif)</span>
+        <input id="pubMaj" maxlength="16" placeholder="ex. a38ec16b84f962cc" autocomplete="off" spellcheck="false" style="font-family:monospace">
+      </label>
+      <p class="mute" id="pubMajHelp" style="margin:0;font-size:.82rem">Laisse vide pour créer une nouvelle carte. Si la carte existe déjà sur NSI Hub, colle son ID (affiché sous la carte dans la galerie) : elle sera mise à jour au lieu d’être dupliquée.</p>
       <div class="row2">
         <a class="btn" id="pubGo" href="#" target="_blank" rel="noopener">Envoyer sur GitHub</a>
         <button class="btn ghost" id="pubClose" type="button">Plus tard</button>
@@ -1054,9 +1058,16 @@ function syncVis(){
 }
 function setVis(v){document.querySelector('input[name="vis"][value="'+v+'"]').checked=true;syncVis()}
 document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("change",syncVis));
-let pubCard=null,pubCode="";
+let pubCard=null,pubCode="",pubId="";
+const ID_RE=/^[0-9a-f]{16}$/;
+function syncMaj(){
+  const v=q("pubMaj").value.trim().toLowerCase();
+  q("pubGo").textContent=v?"Mettre à jour sur GitHub":"Envoyer sur GitHub";
+}
+q("pubMaj").addEventListener("input",syncMaj);
 async function pubTarget(c,pseudo){
-  pubCard=c;pubCode=await encode(c);
+  pubCard=c;pubCode=await encode(c);pubId=await cid(c);
+  q("pubMaj").value=c.nsi||"";syncMaj();
   q("pubOut").hidden=false;q("pubName").textContent=c.nom;q("pubMsg").textContent="";
   q("pubPseudo").value=pseudo||getPseudo();
   q("pubOut").scrollIntoView({behavior:RM.matches?"auto":"smooth",block:"center"});
@@ -1066,13 +1077,16 @@ q("pubGo").addEventListener("click",e=>{
   const pseudo=q("pubPseudo").value.trim();
   if(!pubCard||!pubCode){e.preventDefault();return}
   if(!pseudo){e.preventDefault();q("pubMsg").textContent="Choisis d’abord un pseudo.";q("pubPseudo").focus();return}
+  const maj=q("pubMaj").value.trim().toLowerCase();
+  if(maj&&!ID_RE.test(maj)){e.preventDefault();q("pubMsg").textContent="L’ID doit faire 16 caractères (chiffres et lettres a–f), ou reste vide.";q("pubMaj").focus();return}
   try{localStorage.setItem(PKEY,pseudo)}catch(err){}
-  let url=NSI_ISSUE+"?template=carte-publique.yml&title="+encodeURIComponent("Carte : "+pubCard.nom)+"&pseudo="+encodeURIComponent(pseudo);
+  let url=NSI_ISSUE+"?template=carte-publique.yml&title="+encodeURIComponent((maj?"Mise à jour : ":"Carte : ")+pubCard.nom)+"&pseudo="+encodeURIComponent(pseudo);
+  if(maj)url+="&maj="+maj;
   const long=url.length+pubCode.length>7000;
   if(!long)url+="&code="+pubCode;
   q("pubGo").href=url;
   if(navigator.clipboard)navigator.clipboard.writeText(pubCode).catch(()=>{});
-  pubCard.pub=1;save();renderGrid();q("pubOut").hidden=false;
+  pubCard.pub=1;pubCard.nsi=maj||pubId;save();renderGrid();q("pubOut").hidden=false;
   q("pubMsg").textContent=long?"Code copié : colle-le dans « Code de la carte » sur GitHub.":"Demande ouverte dans un nouvel onglet.";
 });
 q("pubClose").onclick=()=>{q("pubOut").hidden=true;pubCard=null;pubCode=""};
@@ -1282,12 +1296,12 @@ q("bakFile").addEventListener("change",async e=>{
       const img=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]*$/.test(c.img||"")?c.img:"";
       const type=TYPES[c.type]?c.type:"neutre";
       const dup=cards.find(x=>x.nom===c.nom&&x.rar===c.rar&&(x.desc||"")===(c.desc||"")&&(x.img||"")===img&&(x.type||"neutre")===type);
-      if(dup){map[c.id]=dup.id;const a=cleanAtk(c.atk,c.rar);if(a&&!dup.atk)dup.atk=a;return}
+      if(dup){map[c.id]=dup.id;const a=cleanAtk(c.atk,c.rar);if(a&&!dup.atk)dup.atk=a;if(!dup.nsi&&ID_RE.test(c.nsi))dup.nsi=c.nsi;return}
       let id=c.id;
       if(typeof id!=="number"||cards.some(x=>x.id===id))id=Date.now()+Math.floor(Math.random()*1e6);
       map[c.id]=id;
       const atk=cleanAtk(c.atk,c.rar);
-      cards.push({id,nom:c.nom.slice(0,32),rar:c.rar,desc:String(c.desc||"").slice(0,160),img,type,emoji:"🖼️",...(atk?{atk}:{})});
+      cards.push({id,nom:c.nom.slice(0,32),rar:c.rar,desc:String(c.desc||"").slice(0,160),img,type,emoji:"🖼️",...(atk?{atk}:{}),...(ID_RE.test(c.nsi)?{nsi:c.nsi}:{})});
       added++;
     });
     if(d.owned&&typeof d.owned==="object")for(const[k,v]of Object.entries(d.owned)){

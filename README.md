@@ -45,7 +45,7 @@ Les cartes que vous choisissez de rendre **publiques** rejoignent la galerie [Ca
 - ✨ **Animations de révélation** : retournement des cartes, aura de « charge » de plus en plus longue avant une carte rare, éclairs, étincelles, rayons, pluie dorée, secousse de l'écran… et une mise en scène propre à chaque rareté supérieure (braises rouges, étoiles en orbite, voile d'obscurité et feux follets).
 - 📚 **Collection** : deux vues (cartes *obtenues* et cartes *créées*), avec recherche, filtres par rareté et par type, tri et compteur de doublons.
 - 🔍 **Vue agrandie** : carte en grand avec navigation au clavier, par boutons ou par balayage sur mobile.
-- ⚔️ **Match à deux** : deux joueurs sur le même appareil choisissent chacun 3 cartes différentes, puis les deux équipes sont dévoilées (pas encore de combat).
+- ⚔️ **Match à deux** : deux joueurs (sur le même appareil, ou sur deux appareils du même Wi‑Fi) choisissent chacun 3 cartes différentes, puis les deux équipes sont dévoilées (pas encore de combat).
 - 💾 **Sauvegarde complète** : export et restauration de toute la collection dans un fichier, pour ne jamais perdre ses cartes.
 - 🔗 **Partage par code** : chaque carte, image comprise, est encodée dans un code texte à copier-coller sur un autre appareil.
 - 🌍 **Cartes privées ou publiques** : une carte publique est proposée à la galerie communautaire de NSI Hub.
@@ -121,14 +121,18 @@ Deux raccourcis :
 
 ### Faire un match à deux
 
-Dans l'onglet **Match**, deux joueurs se partagent le même appareil :
+Dans l'onglet **Match**, chaque joueur choisit **3 cartes différentes** parmi ses cartes obtenues (il en faut au moins 3). Un joueur peut prendre une carte que l'autre a aussi. Il n'y a pas encore de combat : le match s'arrête au dévoilement des équipes, que l'on peut agrandir en cliquant dessus.
 
-1. Saisissez (si vous voulez) les deux pseudos, puis cliquez sur **Commencer le match**. Il faut au moins **3 cartes obtenues**.
-2. Le joueur 1 choisit **3 cartes différentes** parmi ses cartes obtenues (recherche et filtre par rareté disponibles), puis valide.
-3. L'écran de passage cache son choix : il passe l'appareil au joueur 2, qui choisit à son tour ses 3 cartes. Il peut prendre une carte que le joueur 1 a aussi.
-4. Les deux équipes sont dévoilées côte à côte. Cliquez sur une carte pour la voir en grand.
+**Sur le même appareil** : cliquez sur **Jouer sur cet appareil**. Le joueur 1 choisit, un écran de passage cache son choix, puis le joueur 2 choisit à son tour.
 
-Il n'y a pas encore de combat : le match s'arrête au dévoilement des équipes. Rien n'est enregistré, le match n'est donc pas conservé si vous rechargez la page.
+**Sur deux appareils** (PC, téléphone…) : cliquez sur **📡 Jouer sur deux appareils**. Les deux appareils doivent être sur le même réseau. La connexion est directe entre les deux navigateurs (WebRTC) : il n'y a aucun serveur, donc pas d'adresse IP à saisir, mais deux codes à échanger.
+
+1. Le joueur A clique sur **Créer la partie** et envoie le code affiché au joueur B (message, mail…).
+2. Le joueur B clique sur **Rejoindre une partie**, colle ce code et clique sur **Créer ma réponse**, puis renvoie le code obtenu à A.
+3. A colle ce code de réponse et clique sur **Connecter**.
+4. Chacun choisit ses 3 cartes sur son appareil, en même temps. Quand les deux ont validé, les équipes sont dévoilées. **Rejouer** relance un tour chez les deux joueurs.
+
+Les cartes choisies sont envoyées en entier à l'adversaire (image comprise), car vos collections sont différentes. Rien n'est enregistré : recharger la page met fin au match.
 
 ### Gérer sa collection
 
@@ -326,7 +330,8 @@ Les polices Cinzel et Nunito sont chargées depuis Google Fonts. Hors ligne, l'a
 - Publier une carte nécessite un compte GitHub, et les cartes très lourdes doivent être collées à la main dans la demande.
 - Une carte modifiée après sa publication change d'identifiant : elle ne compte plus comme publique tant que la nouvelle version n'est pas publiée.
 - Publier un booster demande d'abord de publier chacune de ses cartes (une demande par carte).
-- Le mode **Match** se joue sur un seul appareil et s'arrête au choix des équipes : il n'y a pas encore de règles de combat.
+- Le mode **Match** s'arrête au dévoilement des équipes : il n'y a pas encore de règles de combat.
+- Le match sur deux appareils demande d'échanger deux codes à la main et ne fonctionne que si les deux appareils peuvent se joindre directement (même Wi‑Fi, sans isolation des appareils). La connexion est perdue si l'un des joueurs recharge la page.
 
 ---
 

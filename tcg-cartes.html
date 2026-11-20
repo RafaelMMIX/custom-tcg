@@ -354,6 +354,8 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
 .mc{cursor:zoom-in;animation:pop .55s cubic-bezier(.2,.8,.3,1.2) backwards;animation-delay:var(--d,0s)}
 .mc .card{cursor:zoom-in}
 .mvs{align-self:center;font:800 1.5rem var(--serif);color:var(--mute)}
+.mstep{display:grid;gap:10px}
+.mstep textarea{min-height:0;font:.75rem/1.3 ui-monospace,Menlo,Consolas,monospace;word-break:break-all}
 .mpass{text-align:center;justify-items:center}
 .mpass-ico{font-size:3rem}
 .mpass strong{font-size:1.2rem}
@@ -509,12 +511,42 @@ textarea{min-height:90px;resize:vertical}
   <section id="match" hidden>
     <div class="share mbox" id="mSetup">
       <strong>⚔️ Match à deux</strong>
-      <p class="mute">Deux joueurs, un seul appareil : chacun choisit <b>3 cartes différentes</b> parmi les cartes obtenues, l’un après l’autre (sans regarder le choix de l’autre). L’adversaire peut très bien choisir une carte que tu as aussi. Les deux équipes sont ensuite dévoilées. Pas encore de combat !</p>
+      <p class="mute">Chaque joueur choisit <b>3 cartes différentes</b> parmi ses cartes obtenues. L’adversaire peut très bien choisir une carte que tu as aussi. Les deux équipes sont ensuite dévoilées. Pas encore de combat ! Joue sur <b>le même appareil</b> (chacun son tour) ou sur <b>deux appareils</b> (PC, téléphone…).</p>
       <div class="mnames">
         <label>Joueur 1<input id="mN1" maxlength="16" placeholder="Joueur 1" autocomplete="off"></label>
         <label>Joueur 2<input id="mN2" maxlength="16" placeholder="Joueur 2" autocomplete="off"></label>
       </div>
-      <div class="row2"><button class="btn" id="mStart" type="button">Commencer le match</button><span class="mute" id="mMsg" role="status"></span></div>
+      <div class="row2"><button class="btn" id="mStart" type="button">Jouer sur cet appareil</button><button class="btn ghost" id="mNetGo" type="button">📡 Jouer sur deux appareils</button><span class="mute" id="mMsg" role="status"></span></div>
+    </div>
+
+    <div class="share mbox" id="mNet" hidden>
+      <strong>📡 Match sur deux appareils</strong>
+      <p class="mute">Les deux appareils doivent être sur le même Wi‑Fi. Aucun serveur : vous vous échangez deux codes (par message, mail, ou en les dictant). L’un crée la partie, l’autre la rejoint.</p>
+      <label>Ton pseudo<input id="mNetName" maxlength="16" placeholder="Joueur" autocomplete="off"></label>
+      <div class="row2"><button class="btn" id="mHost" type="button">Créer la partie</button><button class="btn ghost" id="mJoin" type="button">Rejoindre une partie</button></div>
+      <div class="mstep" id="mHostBox" hidden>
+        <label>1. Envoie ce code à l’autre joueur
+          <textarea id="mOffer" readonly rows="3" onfocus="this.select()"></textarea>
+        </label>
+        <div class="row2"><button class="btn ghost" id="mCopyO" type="button">Copier le code</button></div>
+        <label>2. Colle ici le code qu’il te renvoie
+          <textarea id="mAnsIn" rows="3" placeholder="NET1-…"></textarea>
+        </label>
+        <div class="row2"><button class="btn" id="mConnect" type="button">Connecter</button></div>
+      </div>
+      <div class="mstep" id="mJoinBox" hidden>
+        <label>1. Colle ici le code de l’hôte
+          <textarea id="mOfferIn" rows="3" placeholder="NET1-…"></textarea>
+        </label>
+        <div class="row2"><button class="btn" id="mMakeAns" type="button">Créer ma réponse</button></div>
+        <div id="mAnsOut" hidden>
+          <label>2. Renvoie ce code à l’hôte, puis attends qu’il le colle
+            <textarea id="mAnswer" readonly rows="3" onfocus="this.select()"></textarea>
+          </label>
+          <div class="row2"><button class="btn ghost" id="mCopyA" type="button">Copier le code</button></div>
+        </div>
+      </div>
+      <div class="row2"><button class="btn ghost" id="mNetBack" type="button">Retour</button><span class="mute" id="mNetMsg" role="status"></span></div>
     </div>
 
     <div id="mPick" hidden>
@@ -1344,13 +1376,14 @@ async function importFromHash(){
 const MATCH_SIZE=3;
 let match={phase:"setup",names:["Joueur 1","Joueur 2"],teams:[[],[]],cur:0};
 const matchPool=()=>cards.filter(c=>owned[c.id]);
-const matchShowOnly=id=>["mSetup","mPick","mPass","mFace"].forEach(s=>q(s).hidden=s!==id);
+const matchShowOnly=id=>["mSetup","mNet","mPick","mPass","mFace"].forEach(s=>q(s).hidden=s!==id);
 
 function matchShow(){
   // ne pas perdre un match en cours quand on change d'onglet
   if(match.phase==="setup")matchSetup();
 }
 function matchSetup(){
+  netClose();
   match.phase="setup";matchShowOnly("mSetup");
   const n=matchPool().length,ok=n>=MATCH_SIZE;
   q("mStart").disabled=!ok;
@@ -1358,13 +1391,13 @@ function matchSetup(){
 }
 function matchName(i){return match.names[i]}
 q("mStart").onclick=()=>{
-  match.names=[q("mN1").value.trim()||"Joueur 1",q("mN2").value.trim()||"Joueur 2"];
+  match.net=false;match.names=[q("mN1").value.trim()||"Joueur 1",q("mN2").value.trim()||"Joueur 2"];
   match.teams=[[],[]];match.cur=0;matchPick();
 };
 function matchPick(){
   match.phase="pick";matchShowOnly("mPick");
   q("mTitle").textContent=matchName(match.cur)+" : choisis tes "+MATCH_SIZE+" cartes";
-  q("mHint").textContent=match.cur===0?"Ton adversaire ne doit pas regarder l’écran !":"Tu peux prendre une carte que "+matchName(0)+" a aussi : ses choix sont cachés.";
+  q("mHint").textContent=match.net?"Ton adversaire choisit en même temps sur son appareil : tu verras ses cartes quand vous aurez tous les deux validé.":match.cur===0?"Ton adversaire ne doit pas regarder l’écran !":"Tu peux prendre une carte que "+matchName(0)+" a aussi : ses choix sont cachés.";
   q("mQs").value="";q("mFr").value="";
   renderMatchPool();renderMatchSlots();
 }
@@ -1408,12 +1441,23 @@ Object.entries(RAR).forEach(([k,r])=>q("mFr").add(new Option(r.l,k)));
 ["mQs","mFr"].forEach(i=>q(i).addEventListener("input",renderMatchPool));
 q("mOk").onclick=()=>{
   if(matchSel().length!==MATCH_SIZE)return;
+  if(match.net){
+    match.myCards=matchSel().map(id=>cards.find(c=>c.id===id)).filter(Boolean);
+    if(!netSend({t:"team",cards:match.myCards.map(c=>({nom:c.nom,rar:c.rar,desc:c.desc||"",img:c.img||"",type:c.type||"neutre"}))}))return;
+    match.sent=true;
+    if(match.oppCards)return matchReveal();
+    match.phase="pass";matchShowOnly("mPass");
+    q("mPassT").textContent="Tes cartes sont prêtes !";
+    q("mPassP").textContent="En attente du choix de "+matchName(1)+"…";
+    q("mGo").hidden=true;
+    return;
+  }
   if(match.cur===0){
     // on cache le choix du joueur 1 avant de passer l'appareil
     match.phase="pass";matchShowOnly("mPass");
     q("mPassT").textContent=matchName(0)+" a choisi ses cartes.";
     q("mPassP").textContent="Passe l’appareil à "+matchName(1)+" sans les montrer.";
-    q("mGo").textContent="Je suis "+matchName(1);
+    q("mGo").textContent="Je suis "+matchName(1);q("mGo").hidden=false;
     window.scrollTo({top:0});
   }else matchReveal();
 };
@@ -1423,11 +1467,12 @@ function matchReveal(){
   match.phase="reveal";matchShowOnly("mFace");
   const z=q("mTeams");z.replaceChildren();
   const all=[];
-  match.teams.forEach((ids,p)=>{
+  const sets=match.net?[match.myCards,match.oppCards]:match.teams.map(ids=>ids.map(id=>cards.find(c=>c.id===id)).filter(Boolean));
+  sets.forEach((list,p)=>{
     const t=document.createElement("div");t.className="mteam";
     const h=document.createElement("h3");h.textContent=matchName(p);
     const trio=document.createElement("div");trio.className="trio";
-    ids.map(id=>cards.find(c=>c.id===id)).filter(Boolean).forEach((c,i)=>{
+    list.forEach((c,i)=>{
       const m=document.createElement("div");m.className="mc";m.style.setProperty("--d",(p*3+i)*.15+"s");
       const ce=cardEl(c),idx=all.length;all.push(c);
       ce.tabIndex=0;ce.setAttribute("role","button");ce.setAttribute("aria-label","Agrandir "+c.nom);
@@ -1440,8 +1485,134 @@ function matchReveal(){
   });
   window.scrollTo({top:0});
 }
-q("mAgain").onclick=()=>{match.teams=[[],[]];match.cur=0;matchPick()};
+q("mAgain").onclick=()=>{
+  if(match.net){if(netSend({t:"again"}))startNet();return}
+  match.teams=[[],[]];match.cur=0;matchPick();
+};
 q("mNew").onclick=()=>matchSetup();
+
+// --- deux appareils : connexion directe WebRTC, sans serveur (on échange deux codes) ---
+const RTC_CFG={iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
+let net=null;
+const netMsgBox=t=>{q("mNetMsg").textContent=t};
+function netEnc(d){return "NET1-"+btoa(JSON.stringify({type:d.type,sdp:d.sdp}))}
+function netDec(t,type){
+  try{const o=JSON.parse(atob(String(t).replace(/\s+/g,"").replace(/^NET1-/,"")));
+    return o&&o.type===type&&typeof o.sdp==="string"?{type:o.type,sdp:o.sdp}:null}catch(e){return null}
+}
+function waitIce(pc){return new Promise(res=>{
+  if(pc.iceGatheringState==="complete")return res();
+  const t=setTimeout(done,6000);
+  function done(){clearTimeout(t);pc.removeEventListener("icegatheringstatechange",ch);res()}
+  function ch(){if(pc.iceGatheringState==="complete")done()}
+  pc.addEventListener("icegatheringstatechange",ch);
+})}
+function netClose(){
+  const n=net;net=null;
+  if(n){try{n.dc&&n.dc.close()}catch(e){}try{n.pc.close()}catch(e){}}
+  match.net=false;match.oppCards=null;match.sent=false;
+}
+function netLost(){
+  if(!net)return;
+  matchSetup();
+  q("mMsg").textContent="Connexion perdue avec l’autre joueur.";
+}
+function netSend(o){
+  try{if(net&&net.dc&&net.dc.readyState==="open"){net.dc.send(JSON.stringify(o));return true}}catch(e){}
+  netLost();return false;
+}
+function netCard(c){
+  if(!c||!RAR[c.rar]||typeof c.nom!=="string"||!c.nom)return null;
+  const img=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]*$/.test(c.img||"")?c.img:"";
+  return{id:0,nom:c.nom.slice(0,32),rar:c.rar,desc:String(c.desc||"").slice(0,160),img,type:TYPES[c.type]?c.type:"neutre",emoji:"🖼️"};
+}
+function startNet(){
+  match.net=true;match.teams=[[],[]];match.cur=0;match.sent=false;match.oppCards=null;q("mGo").hidden=false;
+  matchPick();window.scrollTo({top:0});
+}
+function netMsg(raw){
+  let m;try{m=JSON.parse(raw)}catch(e){return}
+  if(!m||!net)return;
+  if(m.t==="hello"){
+    match.names[1]=String(m.name||"").trim().slice(0,16)||"Adversaire";
+    if(match.phase==="net")startNet();
+  }else if(m.t==="team"){
+    const l=Array.isArray(m.cards)?m.cards.slice(0,MATCH_SIZE).map(netCard):[];
+    if(l.length!==MATCH_SIZE||l.some(x=>!x))return;
+    match.oppCards=l;
+    if(match.sent)matchReveal();
+  }else if(m.t==="again"&&match.net){
+    startNet();
+  }
+}
+function netWire(dc){
+  dc.onopen=()=>{try{dc.send(JSON.stringify({t:"hello",name:match.names[0]}))}catch(e){}};
+  dc.onmessage=e=>netMsg(e.data);
+  dc.onclose=()=>{if(net&&net.dc===dc)netLost()};
+}
+function netNew(role){
+  const pc=new RTCPeerConnection(RTC_CFG);
+  net={pc,role,dc:null};
+  pc.onconnectionstatechange=()=>{if(net&&net.pc===pc&&(pc.connectionState==="failed"||pc.connectionState==="closed"))netLost()};
+  return pc;
+}
+function netPrep(){
+  if(typeof RTCPeerConnection==="undefined"){netMsgBox("Ton navigateur ne gère pas la connexion directe (WebRTC).");return false}
+  netClose();match.net=true;
+  match.names=[q("mNetName").value.trim()||"Joueur","Adversaire"];
+  ["mHostBox","mJoinBox","mAnsOut"].forEach(i=>q(i).hidden=true);
+  return true;
+}
+q("mNetGo").onclick=()=>{
+  match.phase="net";matchShowOnly("mNet");
+  ["mHostBox","mJoinBox","mAnsOut"].forEach(i=>q(i).hidden=true);
+  q("mOffer").value=q("mAnsIn").value=q("mOfferIn").value=q("mAnswer").value="";
+  const ok=matchPool().length>=MATCH_SIZE;
+  q("mHost").disabled=q("mJoin").disabled=!ok;
+  netMsgBox(ok?"":"Il te faut au moins "+MATCH_SIZE+" cartes obtenues : ouvre des boosters !");
+};
+q("mNetBack").onclick=()=>matchSetup();
+q("mHost").onclick=async()=>{
+  if(!netPrep())return;
+  netMsgBox("Création du code…");
+  try{
+    const pc=netNew("host");
+    net.dc=pc.createDataChannel("tcg");netWire(net.dc);
+    await pc.setLocalDescription(await pc.createOffer());
+    await waitIce(pc);
+    q("mOffer").value=netEnc(pc.localDescription);
+    q("mHostBox").hidden=false;netMsgBox("");
+  }catch(e){netMsgBox("Impossible de créer la partie.")}
+};
+q("mConnect").onclick=async()=>{
+  const d=netDec(q("mAnsIn").value,"answer");
+  if(!d||!net||net.role!=="host"){netMsgBox("Ce code n’est pas valide : colle le code de réponse de l’autre joueur.");return}
+  try{await net.pc.setRemoteDescription(d);netMsgBox("Connexion en cours…")}
+  catch(e){netMsgBox("Ce code n’est pas valide ou la partie a expiré : recommence.")}
+};
+q("mJoin").onclick=()=>{
+  if(!netPrep())return;
+  q("mJoinBox").hidden=false;netMsgBox("");
+};
+q("mMakeAns").onclick=async()=>{
+  const d=netDec(q("mOfferIn").value,"offer");
+  if(!d){netMsgBox("Ce code n’est pas valide : colle le code de l’hôte.");return}
+  try{
+    netMsgBox("Création de la réponse…");
+    const pc=netNew("guest");
+    pc.ondatachannel=e=>{if(net&&net.pc===pc){net.dc=e.channel;netWire(e.channel);if(e.channel.readyState==="open")e.channel.onopen()}};
+    await pc.setRemoteDescription(d);
+    await pc.setLocalDescription(await pc.createAnswer());
+    await waitIce(pc);
+    q("mAnswer").value=netEnc(pc.localDescription);
+    q("mAnsOut").hidden=false;netMsgBox("");
+  }catch(e){netMsgBox("Ce code n’est pas valide : recommence.")}
+};
+function copyCode(id){
+  const t=q(id);t.select();
+  (navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).then(()=>netMsgBox("Code copié !"),()=>{try{document.execCommand("copy");netMsgBox("Code copié !")}catch(e){netMsgBox("Copie le code à la main.")}});
+}
+q("mCopyO").onclick=()=>copyCode("mOffer");q("mCopyA").onclick=()=>copyCode("mAnswer");
 
 load();loadB();refreshSelects();renderChoice();renderPreview();importFromHash();
 addEventListener("hashchange",importFromHash);

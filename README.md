@@ -45,7 +45,7 @@ Les cartes que vous choisissez de rendre **publiques** rejoignent la galerie [Ca
 - ✨ **Animations de révélation** : retournement des cartes, aura de « charge » de plus en plus longue avant une carte rare, éclairs, étincelles, rayons, pluie dorée, secousse de l'écran… et une mise en scène propre à chaque rareté supérieure (braises rouges, étoiles en orbite, voile d'obscurité et feux follets).
 - 📚 **Collection** : deux vues (cartes *obtenues* et cartes *créées*), avec recherche, filtres par rareté et par type, tri et compteur de doublons.
 - 🔍 **Vue agrandie** : carte en grand avec navigation au clavier, par boutons ou par balayage sur mobile.
-- ⚔️ **Match à deux** : deux joueurs (sur le même appareil, ou sur deux appareils du même Wi‑Fi) choisissent chacun 3 cartes différentes, puis les deux équipes sont dévoilées (pas encore de combat).
+- ⚔️ **Match à deux** : deux joueurs (sur le même appareil, ou sur deux appareils avec un code à 4 chiffres) choisissent chacun 3 cartes différentes, puis les deux équipes sont dévoilées (pas encore de combat).
 - 💾 **Sauvegarde complète** : export et restauration de toute la collection dans un fichier, pour ne jamais perdre ses cartes.
 - 🔗 **Partage par code** : chaque carte, image comprise, est encodée dans un code texte à copier-coller sur un autre appareil.
 - 🌍 **Cartes privées ou publiques** : une carte publique est proposée à la galerie communautaire de NSI Hub.
@@ -123,16 +123,20 @@ Deux raccourcis :
 
 Dans l'onglet **Match**, chaque joueur choisit **3 cartes différentes** parmi ses cartes obtenues (il en faut au moins 3). Un joueur peut prendre une carte que l'autre a aussi. Il n'y a pas encore de combat : le match s'arrête au dévoilement des équipes, placées sur un **terrain de football** (une équipe de chaque côté, l'une en haut et l'autre en bas sur mobile). Cliquez sur une carte pour l'agrandir.
 
-**Sur le même appareil** : cliquez sur **Jouer sur cet appareil**. Le joueur 1 choisit, un écran de passage cache son choix, puis le joueur 2 choisit à son tour.
+**Sur le même appareil** : cliquez sur **Sur le même appareil**, saisissez les pseudos, puis **C'est parti !**. Le joueur 1 choisit, un écran de passage cache son choix, puis le joueur 2 choisit à son tour.
 
-**Sur deux appareils** (PC, téléphone…) : cliquez sur **📡 Jouer sur deux appareils**. Les deux appareils doivent être sur le même réseau. La connexion est directe entre les deux navigateurs (WebRTC) : il n'y a aucun serveur, donc pas d'adresse IP à saisir, mais deux codes à échanger.
+**Sur deux appareils** (PC, téléphone…) : cliquez sur **Sur deux appareils**. Il faut une connexion internet sur les deux appareils, mais aucun compte.
 
-1. Le joueur A clique sur **Créer la partie** et envoie le code affiché au joueur B (message, mail…).
-2. Le joueur B clique sur **Rejoindre une partie**, colle ce code et clique sur **Créer ma réponse**, puis renvoie le code obtenu à A.
-3. A colle ce code de réponse et clique sur **Connecter**.
+1. Le joueur A tape son pseudo et clique sur **Je crée la partie** : un code à **4 chiffres** s'affiche.
+2. Il le donne au joueur B (message, voix…).
+3. Le joueur B tape son pseudo, clique sur **Je rejoins une partie** et tape le code. La connexion démarre toute seule dès que les 4 chiffres sont saisis.
 4. Chacun choisit ses 3 cartes sur son appareil, en même temps. Quand les deux ont validé, les équipes sont dévoilées. **Rejouer** relance un tour chez les deux joueurs.
 
-Les cartes choisies sont envoyées en entier à l'adversaire (image comprise), car vos collections sont différentes. Rien n'est enregistré : recharger la page met fin au match.
+Le code sert à mettre les deux appareils en relation via le service gratuit [PeerJS](https://peerjs.com) (chargé uniquement quand on lance une partie à deux appareils). Les cartes, elles, passent directement d'un appareil à l'autre. Elles sont envoyées en entier (image comprise), car vos collections sont différentes.
+
+*Pas d'internet ?* Le lien **Connexion manuelle** permet de jouer sur le même Wi‑Fi sans service externe : les deux joueurs s'échangent alors deux longs codes (celui de l'hôte, puis la réponse de l'invité).
+
+Rien n'est enregistré : recharger la page met fin au match.
 
 ### Gérer sa collection
 
@@ -331,7 +335,7 @@ Les polices Cinzel et Nunito sont chargées depuis Google Fonts. Hors ligne, l'a
 - Une carte modifiée après sa publication change d'identifiant : elle ne compte plus comme publique tant que la nouvelle version n'est pas publiée.
 - Publier un booster demande d'abord de publier chacune de ses cartes (une demande par carte).
 - Le mode **Match** s'arrête au dévoilement des équipes : il n'y a pas encore de règles de combat.
-- Le match sur deux appareils demande d'échanger deux codes à la main et ne fonctionne que si les deux appareils peuvent se joindre directement (même Wi‑Fi, sans isolation des appareils). La connexion est perdue si l'un des joueurs recharge la page.
+- Le match sur deux appareils dépend du service PeerJS pour le code à 4 chiffres (internet requis), et la connexion est perdue si l'un des joueurs recharge la page. La connexion manuelle fonctionne sans service externe, mais seulement si les deux appareils peuvent se joindre directement (même Wi‑Fi, sans isolation des appareils).
 
 ---
 

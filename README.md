@@ -284,8 +284,7 @@ Une fois décodées, les données forment un tableau JSON :
 ["Nom", "rarete", "Description", "data:image/jpeg;base64,...", "type", [["Attaque 1", 40], ["Attaque 2", 55]]]
 ```
 
-Le type est omis pour une carte Neutre **sans attaques**. Les attaques forment un 6e élément facultatif : quand elles sont présentes, le type est toujours écrit (`"neutre"` si besoin). Les cartes publiées sur NSI Hub gardent l'ancien format, sans attaques.
-
+Le type est omis pour une carte Neutre **sans attaques**. Les attaques forment un 6e élément facultatif : quand elles sont présentes, le type est toujours écrit (`"neutre"` si besoin). 
 À l'import, l'application vérifie chaque champ : rareté connue, nom non vide, longueurs maximales, image limitée aux formats `data:image/jpeg|png|webp`, et type connu (sinon *Neutre*).
 
 Les clés de rareté sont : `commune`, `rare`, `epique`, `legendaire`, `superlegendaire`, `mythique`, `perdue`.
@@ -357,7 +356,7 @@ Les polices Cinzel et Nunito sont chargées depuis Google Fonts. Hors ligne, l'a
 - Une carte modifiée après sa publication change d'identifiant : elle ne compte plus comme publique tant que la nouvelle version n'est pas publiée.
 - Publier un booster demande d'abord de publier chacune de ses cartes (une demande par carte).
 - Le mode **Match** s'arrête au dévoilement des équipes : il n'y a pas encore de règles de combat (les cartes n'ont pas de points de vie, seulement des attaques).
-- Les attaques ne sont pas envoyées avec les cartes publiées sur NSI Hub, ni présentes sur les cartes qui en viennent : le dépôt `nsi` devrait être adapté.
+- Une carte déjà publiée sur NSI Hub reçoit ses attaques en cliquant sur **Publier** après les avoir ajoutées dans **Modifier** : seul le contenu inchangé de la carte compte (nom, rareté, description, image, type), son identifiant NSI Hub reste le même. Si la carte est modifiée autrement, elle devient une nouvelle carte.
 - Le match sur deux appareils dépend du service PeerJS pour le code à 4 chiffres (internet requis), et la connexion est perdue si l'un des joueurs recharge la page. La connexion manuelle fonctionne sans service externe, mais seulement si les deux appareils peuvent se joindre directement (même Wi‑Fi, sans isolation des appareils).
 
 ---

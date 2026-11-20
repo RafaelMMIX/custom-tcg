@@ -1056,7 +1056,7 @@ function setVis(v){document.querySelector('input[name="vis"][value="'+v+'"]').ch
 document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("change",syncVis));
 let pubCard=null,pubCode="";
 async function pubTarget(c,pseudo){
-  pubCard=c;pubCode=await encode(c,false);
+  pubCard=c;pubCode=await encode(c);
   q("pubOut").hidden=false;q("pubName").textContent=c.nom;q("pubMsg").textContent="";
   q("pubPseudo").value=pseudo||getPseudo();
   q("pubOut").scrollIntoView({behavior:RM.matches?"auto":"smooth",block:"center"});
@@ -1106,7 +1106,7 @@ const b64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...
 const unb64=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return Uint8Array.from(atob(s),c=>c.charCodeAt(0))};
 async function pipe(u,Ctor){return new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(new Ctor("deflate-raw"))).arrayBuffer())}
 async function encode(c,withAtk=true){
-  // les attaques sont un 6e élément facultatif (le type est alors toujours écrit) ; la publication sur NSI Hub reste au format d'origine
+  // les attaques sont un 6e élément facultatif (le type est alors toujours écrit) ; NSI Hub les accepte aussi
   const atk=withAtk&&c.atk&&c.atk.length?c.atk.map(a=>[a.n,a.d]):null;
   const t=atk?[c.type||"neutre",atk]:c.type&&c.type!=="neutre"?[c.type]:[];
   const raw=new TextEncoder().encode(JSON.stringify([c.nom,c.rar,c.desc,c.img,...t]));

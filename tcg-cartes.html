@@ -73,6 +73,14 @@ section[hidden]{display:none}
 @keyframes ghost{50%{filter:brightness(1.18) saturate(1.2);opacity:.94}}
 @media (prefers-reduced-motion:reduce){.card::after{animation:none!important}.flip{transition:none!important}}
 
+/* attaques sur la carte */
+.card .atks{display:grid;gap:2px;background:linear-gradient(180deg,#fffffff2,#ffffffe3);border-radius:9px;padding:4px 8px;box-shadow:0 1px 3px #0002}
+.card .atk{display:flex;justify-content:space-between;gap:6px;align-items:baseline;font:700 .72rem var(--sans)}
+.card .atk .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .atk .pw{font:800 .8rem var(--serif);flex:none}
+.card.has-atk .art{flex-basis:35%;font-size:2.2rem}
+.card.has-atk .desc{font-size:.7rem;padding:4px 8px;line-height:1.25}
+
 /* tirage */
 .stage{display:flex;flex-direction:column;align-items:center;gap:18px;padding:10px 0}
 .flip{width:220px;aspect-ratio:5/7;perspective:900px}
@@ -304,6 +312,18 @@ section:not([hidden]){animation:fadein .4s ease-out}
 .miss-row .btn{padding:5px 10px;font-size:.8rem;flex:none}
 a.btn[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
 #addBWrap[hidden],#fb[hidden]{display:none}
+
+/* attaques (formulaire) */
+.atkset{border:0;padding:0;margin:0;display:grid;gap:8px}
+.atkset legend{font-weight:700;font-size:.9rem;padding:0;margin-bottom:5px}
+#atkRows{display:grid;gap:8px}
+.atkrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,var(--bg) 70%,var(--panel))}
+.atkrow .an{flex:1 1 150px;width:auto}
+.atkrow .ad{flex:1 1 110px;width:auto;padding:0;border:0;background:none;accent-color:var(--accent)}
+.atkrow .av{font:800 1.05rem var(--serif);min-width:3ch;text-align:right}
+.atkrow .atkx{border:0;background:#161a2a;color:#fff;border-radius:50%;width:26px;height:26px;cursor:pointer;font:800 .8rem var(--sans)}
+#atkAdd{justify-self:start}
+#atkAdd[hidden],.atkx[hidden]{display:none}
 
 /* visibilité privée / publique */
 .vis{border:0;padding:0;margin:0;display:grid;gap:6px}
@@ -695,6 +715,12 @@ textarea{min-height:90px;resize:vertical}
         <label>Description
           <textarea id="desc" maxlength="160" placeholder="Une courte description ou un effet…"></textarea>
         </label>
+        <fieldset class="atkset">
+          <legend>Attaques (2 à 3)</legend>
+          <p class="mute" id="atkHint" style="margin:0"></p>
+          <div id="atkRows"></div>
+          <button class="btn ghost" id="atkAdd" type="button">＋ Ajouter une 3e attaque</button>
+        </fieldset>
         <fieldset class="vis">
           <legend>Visibilité</legend>
           <div class="vis-opts">
@@ -744,6 +770,19 @@ textarea{min-height:90px;resize:vertical}
 <script>
 const RAR={commune:{l:"Commune",w:60},rare:{l:"Rare",w:25},epique:{l:"Épique",w:11},legendaire:{l:"Légendaire",w:4},superlegendaire:{l:"Super légendaire",w:1.4},mythique:{l:"Mythique",w:.45},perdue:{l:"Perdue",w:.12}};
 const TYPES={neutre:{l:"Neutre",i:""},feu:{l:"Feu",i:"🔥",c:"#e0502a"},eau:{l:"Eau",i:"💧",c:"#2a8fe0"},nature:{l:"Nature",i:"🌿",c:"#3aa24a"},ombre:{l:"Ombre",i:"🌙",c:"#5a4a8a"},lumiere:{l:"Lumière",i:"✨",c:"#d9b43a"}};
+// attaques : 2 à 3 par carte, puissance limitée par une fourchette selon la rareté (pour des matchs équilibrés)
+const ATK_RANGE={commune:[10,30],rare:[20,50],epique:[30,70],legendaire:[50,100],superlegendaire:[70,130],mythique:[90,160],perdue:[120,200]};
+const ATK_MIN=2,ATK_MAX=3,ATK_STEP=5;
+// accepte {n,d} ou [n,d] ; renvoie une liste propre (puissance ramenée dans la fourchette) ou undefined si invalide
+function cleanAtk(list,rar){
+  if(!Array.isArray(list)||!ATK_RANGE[rar])return undefined;
+  const [lo,hi]=ATK_RANGE[rar];
+  const out=list.slice(0,ATK_MAX).map(a=>{
+    const n=String((Array.isArray(a)?a[0]:a&&a.n)||"").trim().slice(0,20),v=Math.round(+(Array.isArray(a)?a[1]:a&&a.d));
+    return{n,d:Math.min(hi,Math.max(lo,Number.isFinite(v)?v:lo))};
+  }).filter(a=>a.n);
+  return out.length>=ATK_MIN?out:undefined;
+}
 const KEY="tcg-cartes-v1",OKEY="tcg-owned-v1";
 let cards=[],hist=[],draws=0,imgData="",owned={},view="owned";
 function saveOwned(){try{localStorage.setItem(OKEY,JSON.stringify(owned))}catch(e){}}
@@ -767,7 +806,14 @@ function cardEl(c){
   if(c.img)art.style.backgroundImage="url("+c.img+")";else art.textContent=c.emoji||"❔";
   const r=document.createElement("div");r.className="rar";r.textContent=RAR[c.rar].l;
   const ds=document.createElement("div");ds.className="desc";ds.textContent=c.desc||"";
-  d.append(top,art,r,ds);return d;
+  d.append(top,art,r);
+  if(c.atk&&c.atk.length){
+    d.classList.add("has-atk");
+    const al=document.createElement("div");al.className="atks";
+    c.atk.forEach(a=>{const row=document.createElement("div");row.className="atk";const nm=document.createElement("span");nm.className="nm";nm.textContent=a.n;const pw=document.createElement("span");pw.className="pw";pw.textContent=a.d;row.append(nm,pw);al.append(row)});
+    d.append(al);
+  }
+  d.append(ds);return d;
 }
 
 function pick(list=cards){
@@ -880,7 +926,7 @@ function renderGrid(){
   const fbB=getB(q("fb").value);
   list=list.filter(c=>(!s||c.nom.toLowerCase().includes(s))&&(!fr||c.rar===fr)&&(!ft||(c.type||"neutre")===ft)&&(!fbB||fbB.cartes.includes(c.id)));
   list.sort((a,b)=>so==="old"?a.id-b.id:so==="nom"?a.nom.localeCompare(b.nom,"fr"):so==="rar+"?rk(a)-rk(b)||b.id-a.id:so==="rar-"?rk(b)-rk(a)||b.id-a.id:b.id-a.id);
-  q("count").textContent=(view==="owned"?total+" / "+cards.length+" cartes obtenues":total+" cartes créées")+(list.length!==total?" ("+list.length+" affichées)":"");
+  q("count").textContent=(view==="owned"?total+" / "+cards.length+" cartes obtenues":total+" cartes créées"+(cards.some(c=>!c.atk)?" · "+cards.filter(c=>!c.atk).length+" sans attaques (bouton Modifier pour en ajouter)":""))+(list.length!==total?" ("+list.length+" affichées)":"");
   if(!list.length){const p=document.createElement("p");p.className="mute";p.textContent=view==="owned"&&!total?"Aucune carte obtenue pour l’instant : ouvre un booster !":"Aucune carte ne correspond.";g.append(p);return}
   lastList=list;
   list.forEach((c,i)=>{
@@ -906,9 +952,46 @@ function renderGrid(){
 // création
 const $=id=>document.getElementById(id);
 function renderPreview(){
-  $("preview").replaceChildren(cardEl({nom:$("nom").value||"Nom de la carte",rar:$("rar").value,type:$("type").value,desc:$("desc").value||"Description…",img:imgData,emoji:"🖼️"}));
+  const atk=typeof readAtk==="function"?readAtk().map((a,i)=>({n:a.n||"Attaque "+(i+1),d:a.d})):[];
+  $("preview").replaceChildren(cardEl({nom:$("nom").value||"Nom de la carte",rar:$("rar").value,type:$("type").value,desc:$("desc").value||"Description…",img:imgData,emoji:"🖼️",atk}));
 }
 ["nom","rar","type","desc"].forEach(i=>$(i).addEventListener("input",renderPreview));
+// attaques : un curseur par attaque, borné par la fourchette de la rareté choisie
+const atkRows=()=>[...document.querySelectorAll("#atkRows .atkrow")];
+const atkRange=()=>ATK_RANGE[$("rar").value];
+function syncAtk(){
+  const [lo,hi]=atkRange(),rows=atkRows();
+  $("atkHint").textContent="Puissance autorisée pour une carte "+RAR[$("rar").value].l+" : de "+lo+" à "+hi+".";
+  rows.forEach((r,i)=>{
+    const ad=r.querySelector(".ad"),olo=+r.dataset.lo,ohi=+r.dataset.hi;let v=+ad.value;
+    // en changeant de rareté, le curseur garde sa position relative dans la fourchette
+    if(ohi>olo&&(olo!==lo||ohi!==hi))v=lo+Math.round((v-olo)/(ohi-olo)*(hi-lo)/ATK_STEP)*ATK_STEP;
+    r.dataset.lo=lo;r.dataset.hi=hi;
+    ad.min=lo;ad.max=hi;ad.value=Math.min(hi,Math.max(lo,v));
+    r.querySelector(".av").textContent=ad.value;r.querySelector(".atkx").hidden=i<ATK_MIN;
+  });
+  $("atkAdd").hidden=rows.length>=ATK_MAX;
+}
+function addAtkRow(n,d){
+  const [lo,hi]=atkRange(),r=document.createElement("div");r.className="atkrow";
+  r.innerHTML='<input class="an" maxlength="20" placeholder="Nom de l’attaque" aria-label="Nom de l’attaque" required><input class="ad" type="range" aria-label="Puissance de l’attaque"><output class="av"></output><button class="atkx" type="button" aria-label="Retirer cette attaque">✕</button>';
+  const an=r.querySelector(".an"),ad=r.querySelector(".ad");
+  ad.min=lo;ad.max=hi;ad.step=ATK_STEP;ad.value=d!==undefined?d:Math.round((lo+hi)/2/ATK_STEP)*ATK_STEP;an.value=n||"";r.dataset.lo=lo;r.dataset.hi=hi;
+  an.addEventListener("input",renderPreview);
+  ad.addEventListener("input",()=>{r.querySelector(".av").textContent=ad.value;renderPreview()});
+  r.querySelector(".atkx").onclick=()=>{r.remove();syncAtk();renderPreview()};
+  $("atkRows").append(r);syncAtk();
+}
+function setAtk(list){
+  $("atkRows").replaceChildren();
+  (list||[]).slice(0,ATK_MAX).forEach(a=>addAtkRow(a.n,a.d));
+  while(atkRows().length<ATK_MIN)addAtkRow();
+  syncAtk();
+}
+const readAtk=()=>atkRows().map(r=>({n:r.querySelector(".an").value.trim(),d:+r.querySelector(".ad").value}));
+$("atkAdd").onclick=()=>{addAtkRow();renderPreview()};
+$("rar").addEventListener("change",()=>{syncAtk();renderPreview()});
+setAtk([]);
 // recadrage : l'image est déplacée/zoomée dans un canvas 240×160 (taille de l'image exportée)
 let editingId=null,cim=null,zoom=1,ox=0,oy=0,drag=null;
 const cv=$("crop"),cx=cv.getContext("2d");
@@ -944,7 +1027,7 @@ cv.addEventListener("pointermove",e=>{
 });
 ["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>drag=null));
 function resetForm(){
-  $("form").reset();imgData="";editingId=null;cim=null;$("cropBox").hidden=true;
+  $("form").reset();imgData="";editingId=null;cim=null;$("cropBox").hidden=true;setAtk([]);
   $("save").textContent="Enregistrer la carte";$("cancel").hidden=true;renderPreview();
   if(typeof syncAgree==="function")syncAgree();
   if(typeof syncVis==="function")syncVis();
@@ -954,6 +1037,7 @@ function editCard(c){
   editingId=c.id;cim=null;$("cropBox").hidden=true;$("img").value="";
   setVis("prive");
   $("nom").value=c.nom;$("rar").value=c.rar;$("type").value=c.type||"neutre";$("desc").value=c.desc;imgData=c.img;
+  setAtk(c.atk);
   $("save").textContent="Enregistrer les modifications";$("cancel").hidden=false;
   agree.checked=false;syncAgree();syncVis();
   show("creer");
@@ -972,7 +1056,7 @@ function setVis(v){document.querySelector('input[name="vis"][value="'+v+'"]').ch
 document.querySelectorAll('input[name="vis"]').forEach(r=>r.addEventListener("change",syncVis));
 let pubCard=null,pubCode="";
 async function pubTarget(c,pseudo){
-  pubCard=c;pubCode=await encode(c);
+  pubCard=c;pubCode=await encode(c,false);
   q("pubOut").hidden=false;q("pubName").textContent=c.nom;q("pubMsg").textContent="";
   q("pubPseudo").value=pseudo||getPseudo();
   q("pubOut").scrollIntoView({behavior:RM.matches?"auto":"smooth",block:"center"});
@@ -1003,7 +1087,9 @@ $("form").addEventListener("submit",e=>{
   e.preventDefault();
   if(!agree.checked){agreeBox.classList.add("need");agree.focus();return}
   if(document.querySelector('input[name="vis"]:checked').value==="public"&&!$("pseudo").value.trim()){$("pseudo").focus();return}
-  const f={nom:$("nom").value.trim(),rar:$("rar").value,type:$("type").value,desc:$("desc").value.trim(),img:imgData};
+  const atk=cleanAtk(readAtk(),$("rar").value);
+  if(!atk){const bad=atkRows().find(r=>!r.querySelector(".an").value.trim());if(bad)bad.querySelector(".an").focus();return}
+  const f={nom:$("nom").value.trim(),rar:$("rar").value,type:$("type").value,desc:$("desc").value.trim(),img:imgData,atk};
   let nc=cards.find(c=>c.id===editingId);
   if(nc)Object.assign(nc,f);else{nc={id:Date.now(),...f,emoji:"🖼️"};cards.push(nc)}
   const addTo=getB($("addB").value);lastAddB=$("addB").value;
@@ -1019,8 +1105,10 @@ $("form").addEventListener("submit",e=>{
 const b64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")};
 const unb64=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return Uint8Array.from(atob(s),c=>c.charCodeAt(0))};
 async function pipe(u,Ctor){return new Uint8Array(await new Response(new Blob([u]).stream().pipeThrough(new Ctor("deflate-raw"))).arrayBuffer())}
-async function encode(c){
-  const t=c.type&&c.type!=="neutre"?[c.type]:[];
+async function encode(c,withAtk=true){
+  // les attaques sont un 6e élément facultatif (le type est alors toujours écrit) ; la publication sur NSI Hub reste au format d'origine
+  const atk=withAtk&&c.atk&&c.atk.length?c.atk.map(a=>[a.n,a.d]):null;
+  const t=atk?[c.type||"neutre",atk]:c.type&&c.type!=="neutre"?[c.type]:[];
   const raw=new TextEncoder().encode(JSON.stringify([c.nom,c.rar,c.desc,c.img,...t]));
   if(typeof CompressionStream==="undefined")return "TCG0-"+b64(raw);
   return "TCG1-"+b64(await pipe(raw,CompressionStream));
@@ -1029,10 +1117,11 @@ async function decode(code){
   const m=code.trim().replace(/\s+/g,"").match(/^TCG([01])-(.+)$/);if(!m)throw 0;
   let u=unb64(m[2]);
   if(m[1]==="1")u=await pipe(u,DecompressionStream);
-  const [nom,rar,desc,img,type]=JSON.parse(new TextDecoder().decode(u));
+  const [nom,rar,desc,img,type,atk]=JSON.parse(new TextDecoder().decode(u));
   if(!RAR[rar]||typeof nom!=="string"||!nom)throw 0;
   const ok=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]*$/.test(img||"");
-  return {id:Date.now()+Math.floor(Math.random()*1000),nom:nom.slice(0,32),rar,desc:String(desc||"").slice(0,160),img:ok?img:"",type:TYPES[type]?type:"neutre",emoji:"🖼️"};
+  const ca=cleanAtk(atk,rar);
+  return {id:Date.now()+Math.floor(Math.random()*1000),nom:nom.slice(0,32),rar,desc:String(desc||"").slice(0,160),img:ok?img:"",type:TYPES[type]?type:"neutre",emoji:"🖼️",...(ca?{atk:ca}:{})};
 }
 async function showCode(c){
   const code=await encode(c);
@@ -1044,7 +1133,10 @@ q("imp").onclick=async()=>{
   const msg=q("impMsg");
   try{
     const c=await decode(q("inp").value);
-    if(cards.some(x=>x.nom===c.nom&&x.rar===c.rar&&x.desc===c.desc&&x.img===c.img&&(x.type||"neutre")===c.type)){msg.textContent="Cette carte est déjà dans ta collection.";return}
+    const dup=cards.find(x=>x.nom===c.nom&&x.rar===c.rar&&x.desc===c.desc&&x.img===c.img&&(x.type||"neutre")===c.type);
+    if(dup){
+      if(c.atk&&!dup.atk){dup.atk=c.atk;save();renderGrid();q("inp").value="";msg.textContent="Attaques ajoutées à « "+c.nom+" » !";return}
+      msg.textContent="Cette carte est déjà dans ta collection.";return}
     cards.push(c);save();renderGrid();q("inp").value="";msg.textContent="« "+c.nom+" » ajoutée !";
   }catch(e){msg.textContent="Code invalide : vérifie qu’il est complet."}
 };
@@ -1190,11 +1282,12 @@ q("bakFile").addEventListener("change",async e=>{
       const img=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]*$/.test(c.img||"")?c.img:"";
       const type=TYPES[c.type]?c.type:"neutre";
       const dup=cards.find(x=>x.nom===c.nom&&x.rar===c.rar&&(x.desc||"")===(c.desc||"")&&(x.img||"")===img&&(x.type||"neutre")===type);
-      if(dup){map[c.id]=dup.id;return}
+      if(dup){map[c.id]=dup.id;const a=cleanAtk(c.atk,c.rar);if(a&&!dup.atk)dup.atk=a;return}
       let id=c.id;
       if(typeof id!=="number"||cards.some(x=>x.id===id))id=Date.now()+Math.floor(Math.random()*1e6);
       map[c.id]=id;
-      cards.push({id,nom:c.nom.slice(0,32),rar:c.rar,desc:String(c.desc||"").slice(0,160),img,type,emoji:"🖼️"});
+      const atk=cleanAtk(c.atk,c.rar);
+      cards.push({id,nom:c.nom.slice(0,32),rar:c.rar,desc:String(c.desc||"").slice(0,160),img,type,emoji:"🖼️",...(atk?{atk}:{})});
       added++;
     });
     if(d.owned&&typeof d.owned==="object")for(const[k,v]of Object.entries(d.owned)){
@@ -1531,7 +1624,7 @@ q("mOk").onclick=()=>{
   if(matchSel().length!==MATCH_SIZE)return;
   if(match.net){
     match.myCards=matchSel().map(id=>cards.find(c=>c.id===id)).filter(Boolean);
-    if(!netSend({t:"team",cards:match.myCards.map(c=>({nom:c.nom,rar:c.rar,desc:c.desc||"",img:c.img||"",type:c.type||"neutre"}))}))return;
+    if(!netSend({t:"team",cards:match.myCards.map(c=>({nom:c.nom,rar:c.rar,desc:c.desc||"",img:c.img||"",type:c.type||"neutre",atk:c.atk}))}))return;
     match.sent=true;
     if(match.oppCards)return matchReveal();
     match.phase="pass";matchShowOnly("mPass");
@@ -1617,7 +1710,8 @@ function netSend(o){
 function netCard(c){
   if(!c||!RAR[c.rar]||typeof c.nom!=="string"||!c.nom)return null;
   const img=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]*$/.test(c.img||"")?c.img:"";
-  return{id:0,nom:c.nom.slice(0,32),rar:c.rar,desc:String(c.desc||"").slice(0,160),img,type:TYPES[c.type]?c.type:"neutre",emoji:"🖼️"};
+  const atk=cleanAtk(c.atk,c.rar);
+  return{id:0,nom:c.nom.slice(0,32),rar:c.rar,desc:String(c.desc||"").slice(0,160),img,type:TYPES[c.type]?c.type:"neutre",emoji:"🖼️",...(atk?{atk}:{})};
 }
 function startNet(){
   match.net=true;match.teams=[[],[]];match.cur=0;match.sent=false;match.oppCards=null;q("mGo").hidden=false;

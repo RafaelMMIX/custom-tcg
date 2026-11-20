@@ -39,6 +39,7 @@ Les cartes que vous choisissez de rendre **publiques** rejoignent la galerie [Ca
 ## Fonctionnalités
 
 - 🎨 **Création de cartes** : nom, rareté, type (élément), image recadrable et description, avec un aperçu en direct.
+- 🗡️ **Attaques** : chaque carte a 2 ou 3 attaques (nom + puissance), avec une fourchette de puissance par rareté pour garder des matchs équilibrés.
 - 💎 **7 raretés** : Commune, Rare, Épique, Légendaire, Super légendaire, Mythique et Perdue, chacune avec son apparence.
 - 🃏 **Boosters de 5 cartes** : tirage pondéré par la rareté, avec au moins une carte Rare ou mieux par booster.
 - 🎁 **Boosters personnalisés** : rangez vos cartes dans des boosters (nom, emoji, couleur), ouvrez celui de votre choix, publiez-les sur NSI Hub et ouvrez ceux des autres.
@@ -84,6 +85,7 @@ Dans l'onglet **Créer une carte** :
 | **Type** | Neutre, 🔥 Feu, 💧 Eau, 🌿 Nature, 🌙 Ombre ou ✨ Lumière. Il donne une couleur au cadre et ajoute une icône à côté du nom. |
 | **Image** | Facultative. Après l'import, **faites glisser** l'image pour choisir la zone visible et utilisez le curseur **Zoom** (×1 à ×3). L'image est enregistrée en 240 × 160 px. |
 | **Description** | Facultative, 160 caractères maximum. Elle peut contenir un effet, une citation ou un texte d'ambiance. |
+| **Attaques** | **2 attaques obligatoires**, une 3e facultative. Chacune a un nom (20 caractères maximum) et une puissance réglée avec un curseur, limitée par la fourchette de la rareté (voir ci-dessous). Si vous changez la rareté, les curseurs gardent leur position relative dans la nouvelle fourchette. |
 | **Visibilité** | 🔒 **Privée** (la carte reste sur votre appareil) ou 🌍 **Publique** (elle est aussi proposée sur NSI Hub, avec votre pseudo). |
 | **Responsabilité** | Case obligatoire : vous confirmez être seul·e responsable du contenu de la carte. Elle se décoche à chaque nouvelle carte. |
 
@@ -221,6 +223,22 @@ Chaque rareté a un poids :
 
 Le tirage se fait en deux temps : l'application choisit d'abord une **rareté** selon ces poids, puis une **carte au hasard** parmi celles de cette rareté. Seules les raretés présentes dans vos cartes comptent. Par exemple, si vous n'avez créé que des Communes et des Légendaires, une Légendaire sort avec une probabilité de 4 / (60 + 4), soit environ 6 %.
 
+### Attaques et fourchettes de puissance
+
+Pour éviter les cartes trop fortes, la puissance de chaque attaque doit rester dans la fourchette de la rareté de la carte :
+
+| Rareté | Puissance par attaque |
+|---|---|
+| Commune | 10 à 30 |
+| Rare | 20 à 50 |
+| Épique | 30 à 70 |
+| Légendaire | 50 à 100 |
+| Super légendaire | 70 à 130 |
+| Mythique | 90 à 160 |
+| Perdue | 120 à 200 |
+
+La limite est aussi appliquée aux cartes importées par code, par sauvegarde ou reçues pendant un match : une valeur hors fourchette est ramenée dans la fourchette. Les cartes créées avant l'arrivée des attaques n'en ont pas : ouvrez **Mes cartes → Créées → Modifier** pour leur en ajouter. Il n'y a pas encore de combat, les attaques servent pour l'instant à comparer les cartes.
+
 ### Composition d'un booster
 
 - **4 cartes** tirées normalement ;
@@ -263,10 +281,12 @@ TCG0-<données>   données non compressées, encodées en base64url (navigateurs
 Une fois décodées, les données forment un tableau JSON :
 
 ```json
-["Nom", "rarete", "Description", "data:image/jpeg;base64,...", "type"]
+["Nom", "rarete", "Description", "data:image/jpeg;base64,...", "type", [["Attaque 1", 40], ["Attaque 2", 55]]]
 ```
 
-Le type est omis pour une carte Neutre. À l'import, l'application vérifie chaque champ : rareté connue, nom non vide, longueurs maximales, image limitée aux formats `data:image/jpeg|png|webp`, et type connu (sinon *Neutre*).
+Le type est omis pour une carte Neutre **sans attaques**. Les attaques forment un 6e élément facultatif : quand elles sont présentes, le type est toujours écrit (`"neutre"` si besoin). Les cartes publiées sur NSI Hub gardent l'ancien format, sans attaques.
+
+À l'import, l'application vérifie chaque champ : rareté connue, nom non vide, longueurs maximales, image limitée aux formats `data:image/jpeg|png|webp`, et type connu (sinon *Neutre*).
 
 Les clés de rareté sont : `commune`, `rare`, `epique`, `legendaire`, `superlegendaire`, `mythique`, `perdue`.
 
@@ -299,6 +319,8 @@ const RAR = {
 ```
 
 Pour ajouter une rareté, pensez aussi à l'ajouter dans `ORDER` (ordre de révélation), dans `FXC` (couleur des effets), dans la liste du formulaire et dans les styles CSS `.card[data-r="…"]`. Pour qu'elle soit acceptée sur NSI Hub, ajoutez-la aussi dans `tcg-share.js` et dans `.github/scripts/ajouter-carte.mjs` du dépôt `nsi`.
+
+**Changer les fourchettes d'attaque** : objet `ATK_RANGE` (min et max par rareté), ainsi que `ATK_MIN`, `ATK_MAX` et `ATK_STEP` (nombre d'attaques et pas du curseur).
 
 **Ajouter ou modifier un type** : objet `TYPES` (`l` = libellé, `i` = icône, `c` = couleur du cadre).
 
@@ -334,7 +356,8 @@ Les polices Cinzel et Nunito sont chargées depuis Google Fonts. Hors ligne, l'a
 - Publier une carte nécessite un compte GitHub, et les cartes très lourdes doivent être collées à la main dans la demande.
 - Une carte modifiée après sa publication change d'identifiant : elle ne compte plus comme publique tant que la nouvelle version n'est pas publiée.
 - Publier un booster demande d'abord de publier chacune de ses cartes (une demande par carte).
-- Le mode **Match** s'arrête au dévoilement des équipes : il n'y a pas encore de règles de combat.
+- Le mode **Match** s'arrête au dévoilement des équipes : il n'y a pas encore de règles de combat (les cartes n'ont pas de points de vie, seulement des attaques).
+- Les attaques ne sont pas envoyées avec les cartes publiées sur NSI Hub, ni présentes sur les cartes qui en viennent : le dépôt `nsi` devrait être adapté.
 - Le match sur deux appareils dépend du service PeerJS pour le code à 4 chiffres (internet requis), et la connexion est perdue si l'un des joueurs recharge la page. La connexion manuelle fonctionne sans service externe, mais seulement si les deux appareils peuvent se joindre directement (même Wi‑Fi, sans isolation des appareils).
 
 ---

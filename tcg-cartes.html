@@ -335,6 +335,33 @@ a.btn{text-decoration:none;display:inline-block;text-align:center}
 @media (prefers-reduced-motion:reduce){.agree.need{animation:none}}
 .btn.locked{opacity:.55}
 
+/* match à deux */
+.mbox{max-width:620px}
+.mh{font:800 1.3rem var(--serif);margin:0 0 6px}
+.mnames{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.mnames{grid-template-columns:1fr}}
+.mslots{--ms:.6;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.mslot,.mc{width:calc(220px*var(--ms));height:calc(308px*var(--ms));position:relative;flex:none}
+.mslot{border:2px dashed var(--line);border-radius:14px;display:grid;place-items:center;color:var(--mute);font:800 1.6rem var(--serif);background:color-mix(in srgb,var(--panel) 60%,transparent)}
+.mslot.full{border-style:solid;border-color:transparent;background:none;cursor:pointer}
+.mslot .card,.mc .card{position:absolute;left:0;top:0;transform:scale(var(--ms));transform-origin:top left;animation:none!important}
+.mslot .card{pointer-events:none}
+.mslot .x{position:absolute;right:-6px;top:-8px;z-index:6;width:26px;height:26px;border-radius:50%;border:0;background:#161a2a;color:#fff;font:800 .85rem var(--sans);cursor:pointer}
+.mteams{--ms:.62;display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.mteam{display:grid;gap:10px;justify-items:center}
+.mteam h3{margin:0;font:800 1.1rem var(--serif);overflow-wrap:anywhere;text-align:center}
+.mteam .trio{display:flex;gap:10px;justify-content:center}
+.mc{cursor:zoom-in;animation:pop .55s cubic-bezier(.2,.8,.3,1.2) backwards;animation-delay:var(--d,0s)}
+.mc .card{cursor:zoom-in}
+.mvs{align-self:center;font:800 1.5rem var(--serif);color:var(--mute)}
+.mpass{text-align:center;justify-items:center}
+.mpass-ico{font-size:3rem}
+.mpass strong{font-size:1.2rem}
+#mPool .pk-item{opacity:.55}
+#mPool .pk-item[aria-pressed="true"]{opacity:1}
+@media (max-width:640px){.mslots{--ms:.44}.mteams{--ms:.44;gap:18px}.mteam .trio{gap:6px}.mvs{display:none}}
+@media (prefers-reduced-motion:reduce){.mc{animation:none!important}}
+
 /* pied de page */
 .foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);text-align:center;color:var(--mute);font-size:.88rem}
 .foot>p{margin:0 0 8px}
@@ -361,6 +388,7 @@ textarea{min-height:90px;resize:vertical}
     <button role="tab" data-tab="tirer" aria-selected="true">Tirer</button>
     <button role="tab" data-tab="collection" aria-selected="false">Mes cartes</button>
     <button role="tab" data-tab="boosters" aria-selected="false">Boosters</button>
+    <button role="tab" data-tab="match" aria-selected="false">Match</button>
     <button role="tab" data-tab="creer" aria-selected="false">Créer<span class="long"> une carte</span></button>
   </nav>
 
@@ -476,6 +504,44 @@ textarea{min-height:90px;resize:vertical}
       <p class="mute" style="margin:0;font-size:.82rem">Pour publier un booster sur NSI Hub : au moins 10 cartes, dont une de chaque rareté, toutes déjà publiques.</p>
       <div class="acts"><button class="btn" type="submit">Enregistrer le booster</button><button class="btn ghost" id="bCancel" type="button">Annuler</button></div>
     </form>
+  </section>
+
+  <section id="match" hidden>
+    <div class="share mbox" id="mSetup">
+      <strong>⚔️ Match à deux</strong>
+      <p class="mute">Deux joueurs, un seul appareil : chacun choisit <b>3 cartes différentes</b> parmi les cartes obtenues, l’un après l’autre (sans regarder le choix de l’autre). L’adversaire peut très bien choisir une carte que tu as aussi. Les deux équipes sont ensuite dévoilées. Pas encore de combat !</p>
+      <div class="mnames">
+        <label>Joueur 1<input id="mN1" maxlength="16" placeholder="Joueur 1" autocomplete="off"></label>
+        <label>Joueur 2<input id="mN2" maxlength="16" placeholder="Joueur 2" autocomplete="off"></label>
+      </div>
+      <div class="row2"><button class="btn" id="mStart" type="button">Commencer le match</button><span class="mute" id="mMsg" role="status"></span></div>
+    </div>
+
+    <div id="mPick" hidden>
+      <h2 class="mh" id="mTitle"></h2>
+      <p class="mute" id="mHint" style="margin:0 0 12px"></p>
+      <div class="mslots" id="mSlots"></div>
+      <div class="tools">
+        <input id="mQs" type="search" placeholder="Rechercher un nom…" aria-label="Rechercher une carte">
+        <select id="mFr" aria-label="Rareté"><option value="">Toutes raretés</option></select>
+      </div>
+      <div class="bpick" id="mPool"></div>
+      <div class="acts" style="margin-top:14px"><button class="btn" id="mOk" type="button" disabled>Valider mes 3 cartes</button><button class="btn ghost" id="mAbort" type="button">Annuler le match</button></div>
+    </div>
+
+    <div class="share mbox mpass" id="mPass" hidden>
+      <span class="mpass-ico" aria-hidden="true">🤝</span>
+      <strong id="mPassT"></strong>
+      <p class="mute" id="mPassP"></p>
+      <div class="row2" style="justify-content:center"><button class="btn" id="mGo" type="button"></button></div>
+    </div>
+
+    <div id="mFace" hidden>
+      <h2 class="mh">Les équipes sont prêtes !</h2>
+      <div class="mteams" id="mTeams"></div>
+      <p class="mute" style="text-align:center">Clique sur une carte pour la voir en grand. Le combat arrive plus tard…</p>
+      <div class="acts" style="justify-content:center"><button class="btn" id="mAgain" type="button">Rejouer avec les mêmes joueurs</button><button class="btn ghost" id="mNew" type="button">Changer de joueurs</button></div>
+    </div>
   </section>
 
   <section id="creer" hidden>
@@ -974,7 +1040,8 @@ document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{view=b.datase
 // onglets
 function show(name){
   document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===name));
-  ["tirer","collection","boosters","creer"].forEach(s=>$(s).hidden=s!==name);
+  ["tirer","collection","boosters","match","creer"].forEach(s=>$(s).hidden=s!==name);
+  if(name==="match")matchShow();
   if(name==="collection"){enter=true;renderGrid()}
   if(name==="boosters")renderBoosters();
   if(name==="tirer"&&fan.hidden)renderChoice();
@@ -1270,6 +1337,111 @@ async function importFromHash(){
     info.textContent="Booster « "+b.nom+" » ajouté"+(added?" avec "+added+(added>1?" nouvelles cartes":" nouvelle carte"):"")+" ! Clique dessus pour l’ouvrir.";
   }catch(e){info.textContent="Impossible d’importer ce booster depuis NSI Hub."}
 }
+
+// ============ match à deux (local, sur un même appareil) ============
+// Chaque joueur choisit 3 cartes différentes parmi ses cartes obtenues. Les deux choix sont
+// indépendants : une même carte peut se retrouver dans les deux équipes. Pas de combat pour l'instant.
+const MATCH_SIZE=3;
+let match={phase:"setup",names:["Joueur 1","Joueur 2"],teams:[[],[]],cur:0};
+const matchPool=()=>cards.filter(c=>owned[c.id]);
+const matchShowOnly=id=>["mSetup","mPick","mPass","mFace"].forEach(s=>q(s).hidden=s!==id);
+
+function matchShow(){
+  // ne pas perdre un match en cours quand on change d'onglet
+  if(match.phase==="setup")matchSetup();
+}
+function matchSetup(){
+  match.phase="setup";matchShowOnly("mSetup");
+  const n=matchPool().length,ok=n>=MATCH_SIZE;
+  q("mStart").disabled=!ok;
+  q("mMsg").textContent=ok?"":"Il te faut au moins "+MATCH_SIZE+" cartes obtenues (tu en as "+n+") : ouvre des boosters !";
+}
+function matchName(i){return match.names[i]}
+q("mStart").onclick=()=>{
+  match.names=[q("mN1").value.trim()||"Joueur 1",q("mN2").value.trim()||"Joueur 2"];
+  match.teams=[[],[]];match.cur=0;matchPick();
+};
+function matchPick(){
+  match.phase="pick";matchShowOnly("mPick");
+  q("mTitle").textContent=matchName(match.cur)+" : choisis tes "+MATCH_SIZE+" cartes";
+  q("mHint").textContent=match.cur===0?"Ton adversaire ne doit pas regarder l’écran !":"Tu peux prendre une carte que "+matchName(0)+" a aussi : ses choix sont cachés.";
+  q("mQs").value="";q("mFr").value="";
+  renderMatchPool();renderMatchSlots();
+}
+function matchSel(){return match.teams[match.cur]}
+function renderMatchSlots(){
+  const z=q("mSlots"),sel=matchSel();z.replaceChildren();
+  for(let i=0;i<MATCH_SIZE;i++){
+    const c=cards.find(x=>x.id===sel[i]),s=document.createElement("div");
+    s.className="mslot"+(c?" full":"");
+    if(c){
+      s.append(cardEl(c));
+      const x=document.createElement("button");x.type="button";x.className="x";x.textContent="✕";x.setAttribute("aria-label","Retirer "+c.nom);
+      x.onclick=()=>matchToggle(c.id);s.append(x);
+    }else s.textContent=i+1;
+    z.append(s);
+  }
+  q("mOk").disabled=sel.length!==MATCH_SIZE;
+  q("mOk").textContent=sel.length===MATCH_SIZE?"Valider mes "+MATCH_SIZE+" cartes":sel.length+" / "+MATCH_SIZE+" cartes choisies";
+  document.querySelectorAll("#mPool .pk-item").forEach(b=>b.setAttribute("aria-pressed",String(sel.includes(+b.dataset.id))));
+}
+function renderMatchPool(){
+  const z=q("mPool"),s=q("mQs").value.trim().toLowerCase(),fr=q("mFr").value;
+  z.replaceChildren();
+  const list=matchPool().filter(c=>(!s||c.nom.toLowerCase().includes(s))&&(!fr||c.rar===fr))
+    .sort((a,b)=>rk(b)-rk(a)||a.nom.localeCompare(b.nom,"fr"));
+  if(!list.length){const p=document.createElement("p");p.className="mute";p.textContent="Aucune carte ne correspond.";z.append(p);return}
+  list.forEach(c=>{
+    const b=document.createElement("button");b.type="button";b.className="pk-item";b.dataset.id=c.id;
+    b.setAttribute("aria-pressed",String(matchSel().includes(c.id)));b.setAttribute("aria-label",c.nom+", "+RAR[c.rar].l);b.title=c.nom;
+    b.append(cardEl(c));b.onclick=()=>matchToggle(c.id);z.append(b);
+  });
+}
+function matchToggle(id){
+  const sel=matchSel(),i=sel.indexOf(id);
+  if(i>=0)sel.splice(i,1);
+  else if(sel.length<MATCH_SIZE)sel.push(id);
+  else{q("mHint").textContent="Déjà "+MATCH_SIZE+" cartes : retire-en une avant d’en choisir une autre.";return}
+  renderMatchSlots();
+}
+Object.entries(RAR).forEach(([k,r])=>q("mFr").add(new Option(r.l,k)));
+["mQs","mFr"].forEach(i=>q(i).addEventListener("input",renderMatchPool));
+q("mOk").onclick=()=>{
+  if(matchSel().length!==MATCH_SIZE)return;
+  if(match.cur===0){
+    // on cache le choix du joueur 1 avant de passer l'appareil
+    match.phase="pass";matchShowOnly("mPass");
+    q("mPassT").textContent=matchName(0)+" a choisi ses cartes.";
+    q("mPassP").textContent="Passe l’appareil à "+matchName(1)+" sans les montrer.";
+    q("mGo").textContent="Je suis "+matchName(1);
+    window.scrollTo({top:0});
+  }else matchReveal();
+};
+q("mGo").onclick=()=>{match.cur=1;matchPick();window.scrollTo({top:0})};
+q("mAbort").onclick=()=>{match.teams=[[],[]];matchSetup()};
+function matchReveal(){
+  match.phase="reveal";matchShowOnly("mFace");
+  const z=q("mTeams");z.replaceChildren();
+  const all=[];
+  match.teams.forEach((ids,p)=>{
+    const t=document.createElement("div");t.className="mteam";
+    const h=document.createElement("h3");h.textContent=matchName(p);
+    const trio=document.createElement("div");trio.className="trio";
+    ids.map(id=>cards.find(c=>c.id===id)).filter(Boolean).forEach((c,i)=>{
+      const m=document.createElement("div");m.className="mc";m.style.setProperty("--d",(p*3+i)*.15+"s");
+      const ce=cardEl(c),idx=all.length;all.push(c);
+      ce.tabIndex=0;ce.setAttribute("role","button");ce.setAttribute("aria-label","Agrandir "+c.nom);
+      ce.onclick=()=>{lastList=all;openLb(idx,ce)};
+      ce.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();lastList=all;openLb(idx,ce)}};
+      m.append(ce);trio.append(m);
+    });
+    t.append(h,trio);z.append(t);
+    if(p===0){const v=document.createElement("div");v.className="mvs";v.textContent="VS";z.append(v)}
+  });
+  window.scrollTo({top:0});
+}
+q("mAgain").onclick=()=>{match.teams=[[],[]];match.cur=0;matchPick()};
+q("mNew").onclick=()=>matchSetup();
 
 load();loadB();refreshSelects();renderChoice();renderPreview();importFromHash();
 addEventListener("hashchange",importFromHash);

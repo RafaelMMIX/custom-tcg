@@ -18,6 +18,7 @@ Les cartes que vous choisissez de rendre **publiques** rejoignent la galerie [Ca
   - [Créer une carte](#créer-une-carte)
   - [Ouvrir un booster](#ouvrir-un-booster)
   - [Créer ses boosters](#créer-ses-boosters)
+  - [Faire un match à deux](#faire-un-match-à-deux)
   - [Gérer sa collection](#gérer-sa-collection)
   - [Sauvegarder sa collection](#sauvegarder-sa-collection)
   - [Partager une carte](#partager-une-carte)
@@ -44,6 +45,7 @@ Les cartes que vous choisissez de rendre **publiques** rejoignent la galerie [Ca
 - ✨ **Animations de révélation** : retournement des cartes, aura de « charge » de plus en plus longue avant une carte rare, éclairs, étincelles, rayons, pluie dorée, secousse de l'écran… et une mise en scène propre à chaque rareté supérieure (braises rouges, étoiles en orbite, voile d'obscurité et feux follets).
 - 📚 **Collection** : deux vues (cartes *obtenues* et cartes *créées*), avec recherche, filtres par rareté et par type, tri et compteur de doublons.
 - 🔍 **Vue agrandie** : carte en grand avec navigation au clavier, par boutons ou par balayage sur mobile.
+- ⚔️ **Match à deux** : deux joueurs sur le même appareil choisissent chacun 3 cartes différentes, puis les deux équipes sont dévoilées (pas encore de combat).
 - 💾 **Sauvegarde complète** : export et restauration de toute la collection dans un fichier, pour ne jamais perdre ses cartes.
 - 🔗 **Partage par code** : chaque carte, image comprise, est encodée dans un code texte à copier-coller sur un autre appareil.
 - 🌍 **Cartes privées ou publiques** : une carte publique est proposée à la galerie communautaire de NSI Hub.
@@ -69,7 +71,7 @@ C'est tout. Il n'y a ni dépendance à installer ni étape de compilation.
 
 ## Utilisation
 
-L'application comporte quatre onglets : **Tirer**, **Mes cartes**, **Boosters** et **Créer une carte**.
+L'application comporte cinq onglets : **Tirer**, **Mes cartes**, **Boosters**, **Match** et **Créer une carte**.
 
 ### Créer une carte
 
@@ -116,6 +118,17 @@ Deux raccourcis :
 
 - dans **Créer une carte**, le champ **Ajouter au booster** range directement la nouvelle carte dans un booster ;
 - dans **Mes cartes**, le filtre **Tous les boosters** affiche seulement les cartes d'un booster.
+
+### Faire un match à deux
+
+Dans l'onglet **Match**, deux joueurs se partagent le même appareil :
+
+1. Saisissez (si vous voulez) les deux pseudos, puis cliquez sur **Commencer le match**. Il faut au moins **3 cartes obtenues**.
+2. Le joueur 1 choisit **3 cartes différentes** parmi ses cartes obtenues (recherche et filtre par rareté disponibles), puis valide.
+3. L'écran de passage cache son choix : il passe l'appareil au joueur 2, qui choisit à son tour ses 3 cartes. Il peut prendre une carte que le joueur 1 a aussi.
+4. Les deux équipes sont dévoilées côte à côte. Cliquez sur une carte pour la voir en grand.
+
+Il n'y a pas encore de combat : le match s'arrête au dévoilement des équipes. Rien n'est enregistré, le match n'est donc pas conservé si vous rechargez la page.
 
 ### Gérer sa collection
 
@@ -313,7 +326,7 @@ Les polices Cinzel et Nunito sont chargées depuis Google Fonts. Hors ligne, l'a
 - Publier une carte nécessite un compte GitHub, et les cartes très lourdes doivent être collées à la main dans la demande.
 - Une carte modifiée après sa publication change d'identifiant : elle ne compte plus comme publique tant que la nouvelle version n'est pas publiée.
 - Publier un booster demande d'abord de publier chacune de ses cartes (une demande par carte).
-- Il n'y a pas de règles de combat : les cartes sont à collectionner, pas à jouer.
+- Le mode **Match** se joue sur un seul appareil et s'arrête au choix des équipes : il n'y a pas encore de règles de combat.
 
 ---
 
